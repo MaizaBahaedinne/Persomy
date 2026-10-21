@@ -54,7 +54,7 @@
     });
   }
   if (!reduce && 'IntersectionObserver' in window) {
-    var targets = document.querySelectorAll('.card, .step, .section-head, .cta-inner, .empty-state');
+    var targets = document.querySelectorAll('.card, .step, .section-head, .cta-inner, .empty-state, .story, .mission, .value, .city-card');
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {

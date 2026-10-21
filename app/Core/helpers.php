@@ -217,6 +217,47 @@ function split_sections(string $content): array
     return ['intro' => $intro, 'sections' => $sections];
 }
 
+/**
+ * Analyse le corps d'une section : paragraphes, puces et notes en italique (*texte*).
+ * Une puce « - **Titre** — description » devient [titre, description] ; sans gras, le titre est vide.
+ *
+ * @return array{paragraphs: list<string>, items: list<array{0: string, 1: string}>, notes: list<string>}
+ */
+function parse_blocks(string $body): array
+{
+    $paragraphs = [];
+    $items = [];
+    $notes = [];
+    $para = [];
+    $flush = static function () use (&$paragraphs, &$para): void {
+        if ($para) {
+            $paragraphs[] = implode("\n", $para);
+            $para = [];
+        }
+    };
+    foreach (preg_split('/\R/u', trim($body)) ?: [] as $line) {
+        $line = trim($line);
+        if ($line === '') {
+            $flush();
+        } elseif (str_starts_with($line, '- ')) {
+            $flush();
+            $text = trim(substr($line, 2));
+            if (preg_match('/^\*\*(.+?)\*\*\s*(?:[—–:]|\s-\s)\s*(.+)$/u', $text, $m)) {
+                $items[] = [trim($m[1]), trim($m[2])];
+            } else {
+                $items[] = ['', $text];
+            }
+        } elseif (preg_match('/^\*([^*].*?)\*$/u', $line, $m)) {
+            $flush();
+            $notes[] = trim($m[1]);
+        } else {
+            $para[] = $line;
+        }
+    }
+    $flush();
+    return ['paragraphs' => $paragraphs, 'items' => $items, 'notes' => $notes];
+}
+
 /** Icônes SVG simples (traits) identifiées par un nom. */
 function icon(string $name): string
 {
@@ -234,6 +275,8 @@ function icon(string $name): string
         'shield' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
         'users' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
         'star' => '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+        'bulb' => '<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2v.3h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/>',
+        'growth' => '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
     ];
     $inner = $paths[$name] ?? $paths['code'];
     return '<svg class="icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" '

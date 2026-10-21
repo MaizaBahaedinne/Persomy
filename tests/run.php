@@ -160,6 +160,16 @@ $check('logos clients: dossier d’upload autorisé', (static function (): bool 
 $split = split_sections("Intro\n\n## A\n\nTexte A\n\n## B\n\n- x\n- y");
 $check('à propos: découpage en blocs', $split['intro'] === 'Intro' && count($split['sections']) === 2 && $split['sections'][0] === ['title' => 'A', 'body' => 'Texte A'] && str_contains($split['sections'][1]['body'], '- y'));
 $check('à propos: sans titre => aucune section', split_sections('Seulement un texte')['sections'] === []);
+$pb = parse_blocks("Intro\nsuite\n\n- **Titre** — Description **gras**\n- Simple\n\n*Une note*\n\n**Ligne forte**");
+$check('à propos: puces titre/description', $pb['items'] === [['Titre', 'Description **gras**'], ['', 'Simple']]);
+$check('à propos: paragraphes, notes et ligne en gras', $pb['paragraphs'] === ["Intro\nsuite", '**Ligne forte**'] && $pb['notes'] === ['Une note']);
+$aboutSql = SqlSplitter::split((string) file_get_contents(BASE_PATH . '/database/seeders/003_about_page.sql'));
+$check('à propos: seeder (3 langues, sans marqueur à compléter)', count($aboutSql) === 3 && !has_placeholder(implode(' ', $aboutSql)));
+foreach ($aboutSql as $i => $statement) {
+    $about = split_sections((string) preg_replace("/^.*?content = '(.*)'\nWHERE.*$/su", '$1', $statement));
+    $check('à propos: seeder #' . ($i + 1) . ' (5 sections, 2 listes de 5)', count($about['sections']) === 5
+        && count(parse_blocks($about['sections'][1]['body'])['items']) === 5 && count(parse_blocks($about['sections'][2]['body'])['items']) === 5);
+}
 
 // --- SEO / GEO ---
 $robotsAllow = Seo::robotsTxt('allow', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');

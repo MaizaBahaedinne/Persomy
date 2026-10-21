@@ -122,6 +122,9 @@ Administration > **Blog** : articles multilingues (titre, chapeau, contenu, SEO,
 
 Les contenus visibles (coordonnées, textes, services…) sont en base et modifiables sans toucher au code. Le `.env` ne contient que l'infrastructure et les secrets.
 
+### Page « À propos »
+Contenu modifiable dans Administration > Pages > À propos (FR/EN/AR). La mise en page se déduit du texte : paragraphes avant le premier `##` = présentation ; premier `##` sans puces = bloc « mission » ; `##` avec puces `- **Titre** — texte` = cartes (1re liste) puis tuiles (2e liste) ; `##` suivant sans puces = bloc « présence » (Paris/Tunis) ; dernière section = bandeau d'appel à l'action (bouton Contact ajouté automatiquement) ; ligne `*en italique*` = note discrète. Contenu proposé : `php bin/migrate.php --seed` (applique `database/seeders/003_about_page.sql`, **écrase** le contenu actuel de la page).
+
 ### Logos clients (accueil)
 Administration > **Projets** > fiche d'un projet > « Logo du client » (nom + image PNG/WebP/JPEG). Les logos des projets **publiés** défilent automatiquement dans un carrousel sur la page d'accueil (pause au survol, statique si l'utilisateur réduit les animations, un seul logo par client). Après mise à jour : `php bin/migrate.php` (applique `003_project_client_logo.sql`), puis `chown` sur `public/uploads/clients` pour l'utilisateur du site si le dossier existe déjà avec un autre propriétaire.
 
