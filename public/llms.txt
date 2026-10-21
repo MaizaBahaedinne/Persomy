@@ -1,0 +1,30 @@
+# Persomy - digital solutions
+
+> Persomy conçoit des logiciels sur mesure, des plateformes SaaS/PaaS, des solutions d’intelligence artificielle et des automatisations pour les organisations et les professionnels. Bureaux à Paris et Tunis.
+
+Bureaux : Paris · Tunis
+
+LinkedIn : https://www.linkedin.com/company/112819008/
+
+## Pages
+
+- [À propos](https://www.persomy.com/fr/about): Découvrez Persomy (Digital Solutions) : entreprise technologique présente à Paris et à Tunis, spécialisée dans les solutions numériques sur mesure.
+- [Contact](https://www.persomy.com/fr/contact): Contactez Persomy pour échanger sur votre projet de logiciel, de plateforme, d’intelligence artificielle ou d’automatisation.
+
+## Services
+
+- [Logiciels sur mesure](https://www.persomy.com/fr/services): Conception et développement d’applications métier adaptées à vos processus et à vos contraintes.
+- [Plateformes SaaS / PaaS](https://www.persomy.com/fr/services): Création de plateformes en ligne évolutives, du produit à son exploitation.
+- [Intelligence artificielle](https://www.persomy.com/fr/services): Intégration de solutions d’IA pour exploiter vos données et assister vos équipes.
+- [Automatisation](https://www.persomy.com/fr/services): Automatisation des tâches répétitives et des flux de travail pour gagner en efficacité.
+- [Conseil et intégration](https://www.persomy.com/fr/services): Accompagnement dans le cadrage, le choix des outils et leur intégration à votre système d’information.
+
+## Languages
+
+- [English](https://www.persomy.com/en/)
+- [العربية](https://www.persomy.com/ar/)
+
+## Optional
+
+- [Mentions légales](https://www.persomy.com/fr/legal)
+- [Politique de confidentialité](https://www.persomy.com/fr/privacy)
