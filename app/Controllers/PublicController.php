@@ -61,7 +61,11 @@ final class PublicController extends Controller
     public function about(Request $request, array $params): Response
     {
         $page = $this->page('about');
-        return $this->view('public/about', ['meta' => $this->meta($page, 'about', 'about'), 'page' => $page]);
+        return $this->view('public/about', [
+            'meta' => $this->meta($page, 'about', 'about'),
+            'page' => $page,
+            'services' => Service::localized(Lang::locale()),
+        ]);
     }
 
     public function services(Request $request, array $params): Response

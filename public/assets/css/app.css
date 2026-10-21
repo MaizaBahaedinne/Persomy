@@ -353,3 +353,16 @@ a.tag:hover { border-color: var(--blue); background: var(--white); }
   .logo-group { flex-wrap: wrap; justify-content: center; min-width: 0; padding-inline: 1.25rem; }
   .logo-item.logo-dup, .logo-group[aria-hidden="true"] { display: none; }
 }
+
+/* --- Page À propos : blocs --- */
+.about-intro-section { padding-block: clamp(2.5rem, 5vw, 4rem); }
+.about-intro { display: flex; align-items: flex-start; gap: 1.5rem; max-width: 900px; margin-inline: auto; }
+.about-intro .card-icon { flex: 0 0 auto; margin: 0; }
+.about-intro .prose { font-size: 1.25rem; color: var(--ink); }
+.about-intro .prose p:last-child { margin-bottom: 0; }
+.info-card { padding: 2rem 1.8rem; }
+.info-card .card-title { font-size: 1.25rem; }
+.info-body { color: var(--muted); }
+.info-body > :last-child { margin-bottom: 0; }
+.info-body ul { padding-inline-start: 1.2rem; }
+@media (max-width: 600px) { .about-intro { flex-direction: column; } }

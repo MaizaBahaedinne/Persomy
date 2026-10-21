@@ -200,6 +200,23 @@ function format_day(?string $date, ?string $locale = null): string
     return date('d/m/Y', $ts);
 }
 
+/**
+ * Découpe un contenu administrable en une introduction (texte avant le premier « ## »)
+ * et une liste de sections [titre, corps], pour les afficher en blocs.
+ *
+ * @return array{intro: string, sections: list<array{title: string, body: string}>}
+ */
+function split_sections(string $content): array
+{
+    $parts = preg_split('/^##[ \t]+(.+)$/mu', trim($content), -1, PREG_SPLIT_DELIM_CAPTURE) ?: [];
+    $intro = trim((string) array_shift($parts));
+    $sections = [];
+    for ($i = 0; $i + 1 < count($parts); $i += 2) {
+        $sections[] = ['title' => trim($parts[$i]), 'body' => trim($parts[$i + 1])];
+    }
+    return ['intro' => $intro, 'sections' => $sections];
+}
+
 /** Icônes SVG simples (traits) identifiées par un nom. */
 function icon(string $name): string
 {
@@ -211,6 +228,12 @@ function icon(string $name): string
         'consulting' => '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
         'portfolio' => '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
         'blog' => '<path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M18 8h2a0 0 0 0 1 0 0v10a2 2 0 0 1-2 2"/><path d="M8 9h6M8 13h6M8 17h4"/>',
+        'target' => '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+        'heart' => '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+        'pin' => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+        'shield' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+        'users' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+        'star' => '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
     ];
     $inner = $paths[$name] ?? $paths['code'];
     return '<svg class="icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" '

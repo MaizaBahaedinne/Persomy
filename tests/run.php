@@ -157,6 +157,10 @@ $check('logos clients: dossier d’upload autorisé', (static function (): bool 
     }
 })());
 
+$split = split_sections("Intro\n\n## A\n\nTexte A\n\n## B\n\n- x\n- y");
+$check('à propos: découpage en blocs', $split['intro'] === 'Intro' && count($split['sections']) === 2 && $split['sections'][0] === ['title' => 'A', 'body' => 'Texte A'] && str_contains($split['sections'][1]['body'], '- y'));
+$check('à propos: sans titre => aucune section', split_sections('Seulement un texte')['sections'] === []);
+
 // --- SEO / GEO ---
 $robotsAllow = Seo::robotsTxt('allow', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');
 $robotsSearch = Seo::robotsTxt('search_only', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');
