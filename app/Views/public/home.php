@@ -61,6 +61,23 @@
 </section>
 <?php endif; ?>
 
+<?php if (!empty($posts)): ?>
+<section class="section">
+    <div class="container">
+        <header class="section-head">
+            <h2><?= e(t('blog.latest_title')) ?></h2>
+            <p><?= e(t('blog.latest_intro')) ?></p>
+        </header>
+        <div class="grid grid-3">
+            <?php foreach ($posts as $post): ?>
+                <?php require BASE_PATH . '/app/Views/partials/post_card.php'; ?>
+            <?php endforeach; ?>
+        </div>
+        <p class="section-more"><a class="btn btn-outline" href="<?= e(lurl('blog')) ?>"><?= e(t('blog.all_posts')) ?></a></p>
+    </div>
+</section>
+<?php endif; ?>
+
 <section class="section">
     <div class="container">
         <header class="section-head">

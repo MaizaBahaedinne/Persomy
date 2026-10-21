@@ -28,6 +28,7 @@ $navItems = [
     'about' => 'about',
     'services' => 'services',
     'portfolio' => 'portfolio',
+    'blog' => 'blog',
     'contact' => 'contact',
 ];
 ?>
@@ -54,6 +55,11 @@ $navItems = [
         <meta property="og:site_name" content="<?= e($siteName) ?>">
         <meta property="og:locale" content="<?= e($locales[$loc]['og'] ?? 'fr_FR') ?>">
         <?php if ($image): ?><meta property="og:image" content="<?= e($image) ?>"><?php endif; ?>
+        <?php if (!empty($meta['published_time'])): ?><meta property="article:published_time" content="<?= e(date('c', (int) strtotime((string) $meta['published_time']))) ?>"><?php endif; ?>
+    <?php endif; ?>
+    <link rel="alternate" type="application/rss+xml" title="<?= e($siteName . ' — ' . t('nav.blog')) ?>" href="<?= e(lurl('blog/rss.xml')) ?>">
+    <?php if (!empty($meta['jsonld']) && is_array($meta['jsonld'])): ?>
+        <script type="application/ld+json"><?= json_encode($meta['jsonld'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>
     <?php endif; ?>
     <meta name="theme-color" content="#ffffff">
     <link rel="icon" href="<?= e(asset('img/favicon-32.png')) ?>" type="image/png" sizes="32x32">

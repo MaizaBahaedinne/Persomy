@@ -89,7 +89,7 @@ Protégez le fichier : `chmod 640 .env`. Il n'est jamais versionné (`.gitignore
 L'utilisateur du site (celui du vhost) doit pouvoir écrire dans :
 ```bash
 chmod -R u+rwX,g+rX,o-rwx storage
-chmod -R u+rwX public/uploads/projects
+chmod -R u+rwX public/uploads/projects public/uploads/blog
 ```
 Les téléversements ne sont jamais exécutés (`public/uploads/.htaccess` ; vérifier aussi la checklist).
 
@@ -115,7 +115,10 @@ Sinon : bouton « Purger » dans Administration > Messages.
 
 ## Administration
 
-`https://votre-domaine.com/admin` : projets (publication / brouillon, image, traductions FR/EN/AR), catégories, services, textes des pages, réglages (nom, coordonnées, destinataire, langue par défaut, conservation), messages reçus (statuts, suppression, purge), changement de mot de passe.
+`https://votre-domaine.com/admin` : projets (publication / brouillon, image, traductions FR/EN/AR), catégories, **blog** (articles, catégories du blog), services, textes des pages, réglages (nom, coordonnées, destinataire, langue par défaut, conservation), messages reçus (statuts, suppression, purge), changement de mot de passe.
+
+### Blog
+Administration > **Blog** : articles multilingues (titre, chapeau, contenu, SEO, image de couverture), brouillon / publié, **publication programmée** (date future, statut « Publié »), catégories. Public : `/{langue}/blog` (filtre par catégorie, pagination), `/{langue}/blog/{slug}`, flux RSS `/{langue}/blog/rss.xml`, entrées du sitemap, données structurées `BlogPosting`. Mise en forme du contenu : `## Titre`, `### Sous-titre`, `- liste`, `**gras**`, `[texte](https://…)` ou `[texte](/fr/contact)` (tout le reste est échappé, aucun HTML brut). Après mise à jour : `php bin/migrate.php --seed` (applique `002_create_blog.sql` et la page « Blog »), puis `chown` sur `public/uploads/blog` pour l'utilisateur du site.
 
 Les contenus visibles (coordonnées, textes, services…) sont en base et modifiables sans toucher au code. Le `.env` ne contient que l'infrastructure et les secrets.
 

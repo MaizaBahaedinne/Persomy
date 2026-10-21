@@ -108,20 +108,22 @@ function is_valid_slug(string $slug): bool
  * paragraphes (ligne vide), "## " titre, "### " sous-titre, "- " liste.
  * Tout le texte est échappé : aucun HTML brut n'est interprété.
  */
-function format_content(string $text): string
+function format_content(string $text, bool $inline = false): string
 {
+    // $inline : gras (**texte**) et liens ([libellé](https://…) ou [libellé](/chemin)) ; tout est échappé d'abord.
+    $fmt = $inline ? 'format_inline' : 'e';
     $html = '';
     $para = [];
     $list = [];
-    $flushPara = static function () use (&$html, &$para): void {
+    $flushPara = static function () use (&$html, &$para, $fmt): void {
         if ($para) {
-            $html .= '<p>' . implode('<br>', array_map('e', $para)) . '</p>';
+            $html .= '<p>' . implode('<br>', array_map($fmt, $para)) . '</p>';
             $para = [];
         }
     };
-    $flushList = static function () use (&$html, &$list): void {
+    $flushList = static function () use (&$html, &$list, $fmt): void {
         if ($list) {
-            $html .= '<ul>' . implode('', array_map(static fn(string $i): string => '<li>' . e($i) . '</li>', $list)) . '</ul>';
+            $html .= '<ul>' . implode('', array_map(static fn(string $i): string => '<li>' . $fmt($i) . '</li>', $list)) . '</ul>';
             $list = [];
         }
     };
@@ -153,6 +155,51 @@ function format_content(string $text): string
     return $html;
 }
 
+/**
+ * Échappe un texte puis applique le format en ligne : **gras** et liens [libellé](https://…) / [libellé](/chemin).
+ * Seuls http(s):// et les chemins internes sont acceptés comme cibles de lien (pas de javascript:, data:, //).
+ * Le gras est traité en premier : une cible contenant « ** » n'est donc jamais transformée en lien.
+ */
+function format_inline(string $text): string
+{
+    $html = e($text);
+    $html = preg_replace('/\*\*([^*\r\n]+)\*\*/u', '<strong>$1</strong>', $html) ?? $html;
+    return preg_replace_callback(
+        '/\[([^\[\]\r\n]+)\]\((https?:\/\/[^\s()<>"\']+|\/(?!\/)[^\s()<>"\']*)\)/u',
+        static function (array $m): string {
+            $external = str_starts_with($m[2], 'http');
+            return '<a href="' . $m[2] . '"' . ($external ? ' rel="noopener noreferrer" target="_blank"' : '') . '>' . $m[1] . '</a>';
+        },
+        $html
+    ) ?? $html;
+}
+
+/** Temps de lecture estimé (≈ 200 mots/minute), au minimum 1 minute. */
+function reading_minutes(string $text): int
+{
+    $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    return max(1, (int) ceil(count($words) / 200));
+}
+
+/** Date longue localisée (ex. « 21 octobre 2026 »), avec repli si l'extension intl est absente. */
+function format_day(?string $date, ?string $locale = null): string
+{
+    $ts = $date ? strtotime($date) : false;
+    if (!$ts) {
+        return '';
+    }
+    $locale ??= Lang::locale();
+    if (class_exists(\IntlDateFormatter::class)) {
+        $map = ['fr' => 'fr_FR', 'en' => 'en_GB', 'ar' => 'ar'];
+        $formatter = new \IntlDateFormatter($map[$locale] ?? 'fr_FR', \IntlDateFormatter::LONG, \IntlDateFormatter::NONE);
+        $out = $formatter->format($ts);
+        if (is_string($out) && $out !== '') {
+            return $out;
+        }
+    }
+    return date('d/m/Y', $ts);
+}
+
 /** Icônes SVG simples (traits) identifiées par un nom. */
 function icon(string $name): string
 {
@@ -163,6 +210,7 @@ function icon(string $name): string
         'automation' => '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
         'consulting' => '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
         'portfolio' => '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+        'blog' => '<path d="M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2z"/><path d="M18 8h2a0 0 0 0 1 0 0v10a2 2 0 0 1-2 2"/><path d="M8 9h6M8 13h6M8 17h4"/>',
     ];
     $inner = $paths[$name] ?? $paths['code'];
     return '<svg class="icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" '

@@ -308,3 +308,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); outline: 
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* --- Blog --- */
+.post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .25rem 0 1rem; color: var(--muted); font-size: .9rem; }
+.page-hero .post-meta { margin-top: 1.25rem; }
+a.tag { text-decoration: none; transition: border-color .2s, background-color .2s; }
+a.tag:hover { border-color: var(--blue); background: var(--white); }
+.article { max-width: 820px; }
+.article .prose { max-width: none; }
+.article .prose a { color: var(--blue-dark); text-decoration: underline; text-underline-offset: 3px; }
+.article .prose a:hover { color: var(--blue); }
+.article .prose h3 { margin-top: 1.5em; }
+.article .project-figure { max-width: none; }
+.pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem; margin-top: 3rem; }
+.pagination-info { color: var(--muted); font-size: .95rem; }

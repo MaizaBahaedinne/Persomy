@@ -13,8 +13,19 @@ final class Uploader
 {
     public const DIR = '/public/uploads/projects';
 
+    /** Sous-dossiers autorisés dans public/uploads (jamais issus d'une saisie utilisateur). */
+    private const FOLDERS = ['projects', 'blog'];
+
+    private static function folder(string $folder): string
+    {
+        if (!in_array($folder, self::FOLDERS, true)) {
+            throw new \InvalidArgumentException('Dossier de téléversement inconnu.');
+        }
+        return BASE_PATH . '/public/uploads/' . $folder;
+    }
+
     /** @return string nom de fichier stocké (ex. 3f2a....jpg) */
-    public static function saveImage(array $file): string
+    public static function saveImage(array $file, string $folder = 'projects'): string
     {
         $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
         if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE) {
@@ -46,7 +57,7 @@ final class Uploader
             throw new \RuntimeException('Dimensions trop grandes (' . $max . ' px maximum).');
         }
 
-        $dir = BASE_PATH . self::DIR;
+        $dir = self::folder($folder);
         if (!is_dir($dir) && !@mkdir($dir, 0755, true) && !is_dir($dir)) {
             throw new \RuntimeException('Dossier de téléversement inaccessible.');
         }
@@ -58,10 +69,10 @@ final class Uploader
         return $name;
     }
 
-    public static function delete(?string $name): void
+    public static function delete(?string $name, string $folder = 'projects'): void
     {
         if ($name !== null && self::isValidName($name)) {
-            $path = BASE_PATH . self::DIR . '/' . $name;
+            $path = self::folder($folder) . '/' . $name;
             if (is_file($path)) {
                 @unlink($path);
             }

@@ -7,6 +7,8 @@ namespace App\Controllers;
 use App\Core\Lang;
 use App\Core\Request;
 use App\Core\Response;
+use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Project;
@@ -20,10 +22,14 @@ final class PublicController extends Controller
         'about' => 'about',
         'services' => 'services',
         'portfolio' => 'portfolio',
+        'blog' => 'blog',
         'contact' => 'contact',
         'legal' => 'legal',
         'privacy' => 'privacy',
     ];
+
+    /** Nombre d'articles par page du blog. */
+    private const POSTS_PER_PAGE = 9;
 
     public function root(Request $request, array $params): Response
     {
@@ -41,6 +47,7 @@ final class PublicController extends Controller
             'page' => $page,
             'services' => Service::localized($locale),
             'projects' => $projects,
+            'posts' => BlogPost::published($locale, null, 3),
         ]);
     }
 
@@ -105,6 +112,114 @@ final class PublicController extends Controller
         ]);
     }
 
+    public function blog(Request $request, array $params): Response
+    {
+        $locale = Lang::locale();
+        $page = Page::get('blog', $locale) ?? [
+            'title' => t('blog.title'),
+            'intro' => t('blog.intro'),
+            'meta_title' => '',
+            'meta_description' => '',
+            'content' => '',
+        ];
+
+        $categories = BlogCategory::withPublishedPosts($locale);
+        $selected = $request->query('category');
+        $selected = in_array($selected, array_column($categories, 'slug'), true) ? $selected : null;
+
+        $total = BlogPost::countPublished($selected);
+        $pages = max(1, (int) ceil($total / self::POSTS_PER_PAGE));
+        $current = min($pages, max(1, (int) $request->query('page')));
+        $posts = BlogPost::published($locale, $selected, self::POSTS_PER_PAGE, ($current - 1) * self::POSTS_PER_PAGE);
+
+        return $this->view('public/blog', [
+            'meta' => $this->meta($page, 'blog', 'blog'),
+            'page' => $page,
+            'posts' => $posts,
+            'categories' => $categories,
+            'selected' => $selected,
+            'current' => $current,
+            'pages' => $pages,
+        ]);
+    }
+
+    public function blogPost(Request $request, array $params): Response
+    {
+        $locale = Lang::locale();
+        $post = BlogPost::publishedBySlug((string) $params['slug'], $locale);
+        if ($post === null) {
+            $this->abort(404);
+        }
+        $t = $post['t'];
+        $path = 'blog/' . $post['slug'];
+        $description = $t['meta_description'] !== ''
+            ? $t['meta_description']
+            : truncate($t['excerpt'] !== '' ? $t['excerpt'] : (string) preg_replace('/[#*\[\]()\-]+/u', ' ', (string) $t['content']));
+        $image = $post['cover_image'] ? '/uploads/blog/' . $post['cover_image'] : null;
+        $siteName = (string) setting('site_name', 'Persomy');
+        $author = trim((string) $post['author']);
+
+        $jsonld = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => $t['title'],
+            'description' => $description,
+            'inLanguage' => $t['_locale'] ?? $locale,
+            'datePublished' => date('c', (int) strtotime((string) $post['published_at'])),
+            'dateModified' => date('c', (int) strtotime((string) ($post['updated_at'] ?? $post['published_at']))),
+            'mainEntityOfPage' => abs_url(lurl($path)),
+            'author' => $author !== '' ? ['@type' => 'Person', 'name' => $author] : ['@type' => 'Organization', 'name' => $siteName],
+            'publisher' => ['@type' => 'Organization', 'name' => $siteName],
+        ];
+        if ($image !== null) {
+            $jsonld['image'] = abs_url($image);
+        }
+
+        return $this->view('public/blog_post', [
+            'meta' => [
+                'title' => $t['meta_title'] !== '' ? $t['meta_title'] : $t['title'],
+                'description' => $description,
+                'path' => $path,
+                'nav' => 'blog',
+                'image' => $image,
+                'type' => 'article',
+                'published_time' => $post['published_at'],
+                'jsonld' => $jsonld,
+            ],
+            'post' => $post,
+            'related' => BlogPost::related($post, $locale, 3),
+        ]);
+    }
+
+    public function blogFeed(Request $request, array $params): Response
+    {
+        $locale = Lang::locale();
+        $siteName = (string) setting('site_name', 'Persomy');
+        $selfUrl = abs_url(lurl('blog/rss.xml'));
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+            . '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n<channel>\n"
+            . '  <title>' . $this->xml($siteName . ' — ' . t('blog.title')) . "</title>\n"
+            . '  <link>' . $this->xml(abs_url(lurl('blog'))) . "</link>\n"
+            . '  <description>' . $this->xml(t('blog.intro')) . "</description>\n"
+            . '  <language>' . $this->xml($locale) . "</language>\n"
+            . '  <atom:link href="' . $this->xml($selfUrl) . '" rel="self" type="application/rss+xml"/>' . "\n";
+
+        foreach (BlogPost::published($locale, null, 20) as $post) {
+            $t = $post['t'];
+            $url = $this->xml(abs_url(lurl('blog/' . $post['slug'])));
+            $xml .= "  <item>\n"
+                . '    <title>' . $this->xml($t['title']) . "</title>\n"
+                . '    <link>' . $url . "</link>\n"
+                . '    <guid isPermaLink="true">' . $url . "</guid>\n"
+                . '    <pubDate>' . date(DATE_RSS, (int) strtotime((string) $post['published_at'])) . "</pubDate>\n"
+                . '    <description>' . $this->xml($t['excerpt'] !== '' ? $t['excerpt'] : truncate((string) $t['content'], 300)) . "</description>\n"
+                . "  </item>\n";
+        }
+
+        return Response::text($xml . "</channel>\n</rss>\n", 'application/rss+xml; charset=UTF-8');
+    }
+
     public function legal(Request $request, array $params): Response
     {
         $page = $this->page('legal');
@@ -138,6 +253,9 @@ final class PublicController extends Controller
         }
         foreach (Project::published($default) as $project) {
             $entries[] = ['portfolio/' . $project['slug'], $project['updated_at']];
+        }
+        foreach (BlogPost::sitemapEntries() as $post) {
+            $entries[] = ['blog/' . $post['slug'], $post['updated_at']];
         }
 
         foreach ($entries as [$path, $lastmod]) {

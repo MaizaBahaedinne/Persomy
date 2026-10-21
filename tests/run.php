@@ -124,13 +124,35 @@ $check('mail: clean()', Mailer::clean("a\r\nb\0c") === 'a b c');
 $check('upload: nom valide', Uploader::isValidName(str_repeat('a', 32) . '.jpg'));
 $check('upload: traversée refusée', !Uploader::isValidName('../../.env') && !Uploader::isValidName(str_repeat('a', 32) . '.php'));
 
+// --- Blog ---
+$inline = format_content("Un **gras** et [lien](https://exemple.com/a?b=1) et [page](/fr/contact)\n\n[mal](javascript:alert(1)) [x](//evil.example) <b>ok</b>", true);
+$check('blog: gras', str_contains($inline, '<strong>gras</strong>'));
+$check('blog: lien externe sécurisé', str_contains($inline, '<a href="https://exemple.com/a?b=1" rel="noopener noreferrer" target="_blank">lien</a>'));
+$check('blog: lien interne', str_contains($inline, '<a href="/fr/contact">page</a>'));
+$check('blog: javascript: et // refusés', !str_contains($inline, 'href="javascript') && !str_contains($inline, 'href="//') && !str_contains($inline, '<b>'));
+$check('blog: format simple inchangé', !str_contains(format_content('**x** [a](https://b.c)'), '<strong>'));
+$check('blog: temps de lecture', reading_minutes('') === 1 && reading_minutes(str_repeat('mot ', 401)) === 3);
+$check('blog: date vide', format_day(null) === '' && format_day('2026-03-05 10:00:00', 'en') !== '');
+$check('blog: dossier d’upload inconnu refusé', (static function (): bool {
+    try {
+        Uploader::delete(str_repeat('a', 32) . '.jpg', '../etc');
+        return false;
+    } catch (\InvalidArgumentException) {
+        return true;
+    }
+})());
+$blogRoute = Router::compile('/{lang:fr|en|ar}/blog/{slug:[a-z0-9]+(?:-[a-z0-9]+)*}');
+$check('blog: route article (slug valide uniquement)', preg_match($blogRoute, '/fr/blog/mon-article') === 1 && preg_match($blogRoute, '/fr/blog/rss.xml') !== 1);
+$blogSql = SqlSplitter::split((string) file_get_contents(BASE_PATH . '/database/migrations/002_create_blog.sql'));
+$check('blog: migration (4 tables)', count($blogSql) === 4);
+
 // --- Gabarits : aucun style/script en ligne (CSP stricte) ---
 $offenders = [];
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(BASE_PATH . '/app/Views'));
 foreach ($iterator as $file) {
     if ($file->isFile() && $file->getExtension() === 'php') {
         $content = (string) file_get_contents($file->getPathname());
-        if (preg_match('/<script(?![^>]*\bsrc=)[^>]*>|\sstyle="|\sonclick=|\sonsubmit=|<style\b/i', $content)) {
+        if (preg_match('/<script(?![^>]*\bsrc=)(?![^>]*\btype="application\/ld\+json")[^>]*>|\sstyle="|\sonclick=|\sonsubmit=|<style\b/i', $content)) {
             $offenders[] = str_replace(BASE_PATH . '/', '', $file->getPathname());
         }
     }

@@ -24,6 +24,9 @@ $router->get($lang . '/about', [PublicController::class, 'about']);
 $router->get($lang . '/services', [PublicController::class, 'services']);
 $router->get($lang . '/portfolio', [PublicController::class, 'portfolio']);
 $router->get($lang . '/portfolio/{slug:[a-z0-9]+(?:-[a-z0-9]+)*}', [PublicController::class, 'project']);
+$router->get($lang . '/blog', [PublicController::class, 'blog']);
+$router->get($lang . '/blog/rss.xml', [PublicController::class, 'blogFeed']);
+$router->get($lang . '/blog/{slug:[a-z0-9]+(?:-[a-z0-9]+)*}', [PublicController::class, 'blogPost']);
 $router->get($lang . '/legal', [PublicController::class, 'legal']);
 $router->get($lang . '/privacy', [PublicController::class, 'privacy']);
 $router->get($lang . '/contact', [ContactController::class, 'show']);
@@ -50,6 +53,21 @@ $router->post('/admin/categories', [Admin\CategoryController::class, 'store'], $
 $router->get('/admin/categories/{id:\d+}/edit', [Admin\CategoryController::class, 'edit'], $auth);
 $router->post('/admin/categories/{id:\d+}', [Admin\CategoryController::class, 'update'], $authPost);
 $router->post('/admin/categories/{id:\d+}/delete', [Admin\CategoryController::class, 'destroy'], $authPost);
+
+$router->get('/admin/blog', [Admin\BlogPostController::class, 'index'], $auth);
+$router->get('/admin/blog/create', [Admin\BlogPostController::class, 'create'], $auth);
+$router->post('/admin/blog', [Admin\BlogPostController::class, 'store'], $authPost);
+$router->get('/admin/blog/{id:\d+}/edit', [Admin\BlogPostController::class, 'edit'], $auth);
+$router->post('/admin/blog/{id:\d+}', [Admin\BlogPostController::class, 'update'], $authPost);
+$router->post('/admin/blog/{id:\d+}/toggle', [Admin\BlogPostController::class, 'toggle'], $authPost);
+$router->post('/admin/blog/{id:\d+}/delete', [Admin\BlogPostController::class, 'destroy'], $authPost);
+
+$router->get('/admin/blog-categories', [Admin\BlogCategoryController::class, 'index'], $auth);
+$router->get('/admin/blog-categories/create', [Admin\BlogCategoryController::class, 'create'], $auth);
+$router->post('/admin/blog-categories', [Admin\BlogCategoryController::class, 'store'], $authPost);
+$router->get('/admin/blog-categories/{id:\d+}/edit', [Admin\BlogCategoryController::class, 'edit'], $auth);
+$router->post('/admin/blog-categories/{id:\d+}', [Admin\BlogCategoryController::class, 'update'], $authPost);
+$router->post('/admin/blog-categories/{id:\d+}/delete', [Admin\BlogCategoryController::class, 'destroy'], $authPost);
 
 $router->get('/admin/services', [Admin\ServiceController::class, 'index'], $auth);
 $router->get('/admin/services/create', [Admin\ServiceController::class, 'create'], $auth);

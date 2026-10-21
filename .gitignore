@@ -12,6 +12,8 @@ storage/cache/*
 # Fichiers téléversés (contenus de production)
 public/uploads/projects/*
 !public/uploads/projects/.gitkeep
+public/uploads/blog/*
+!public/uploads/blog/.gitkeep
 
 # Sauvegardes, dumps SQL
 *.sql.gz

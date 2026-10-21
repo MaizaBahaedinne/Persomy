@@ -21,6 +21,7 @@ $linkedin = setting('linkedin_url');
                 <li><a href="<?= e(lurl('about')) ?>"><?= e(t('nav.about')) ?></a></li>
                 <li><a href="<?= e(lurl('services')) ?>"><?= e(t('nav.services')) ?></a></li>
                 <li><a href="<?= e(lurl('portfolio')) ?>"><?= e(t('nav.portfolio')) ?></a></li>
+                <li><a href="<?= e(lurl('blog')) ?>"><?= e(t('nav.blog')) ?></a></li>
                 <li><a href="<?= e(lurl('contact')) ?>"><?= e(t('nav.contact')) ?></a></li>
             </ul>
         </div>
@@ -45,6 +46,7 @@ $linkedin = setting('linkedin_url');
         <ul class="footer-legal">
             <li><a href="<?= e(lurl('legal')) ?>"><?= e(t('footer.legal')) ?></a></li>
             <li><a href="<?= e(lurl('privacy')) ?>"><?= e(t('footer.privacy')) ?></a></li>
+            <li><a href="<?= e(lurl('blog/rss.xml')) ?>"><?= e(t('blog.feed')) ?></a></li>
             <?php if (Response::$allowAnalytics): ?>
                 <li><button class="link-button" type="button" data-consent-open hidden><?= e(t('consent.manage')) ?></button></li>
             <?php endif; ?>
