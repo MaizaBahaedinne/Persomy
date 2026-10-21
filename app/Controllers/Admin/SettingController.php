@@ -30,6 +30,7 @@ final class SettingController extends AdminController
         'linkedin_url' => ['Lien LinkedIn', 'url', 'URL complète en https://.'],
         'analytics_id' => ['Google Analytics (identifiant de mesure)', 'ga_id', 'Format G-XXXXXXXXXX. Laisser vide pour désactiver. Mentionner Google Analytics dans la politique de confidentialité.'],
         'consent_mode' => ['Mode de consentement Google', 'consent_mode', 'Google Consent Mode v2 : tout est refusé par défaut, le choix du visiteur met à jour les autorisations.'],
+        'ai_crawlers' => ['Robots IA (robots.txt)', 'ai_crawlers', 'Contrôle l’accès de ChatGPT, Claude, Perplexity, Gemini… Le fichier /robots.txt est généré automatiquement ; /llms.txt résume le site pour les IA.'],
         'contact_retention_days' => ['Conservation des demandes (jours)', 'number', 'Les demandes plus anciennes peuvent être purgées depuis « Messages ».'],
     ];
 
@@ -78,6 +79,11 @@ final class SettingController extends AdminController
                     case 'consent_mode':
                         if (!isset(self::CONSENT_MODES[$value])) {
                             $errors[] = $label . ' : mode non reconnu.';
+                        }
+                        break;
+                    case 'ai_crawlers':
+                        if (!isset(\App\Services\Seo::AI_MODES[$value])) {
+                            $errors[] = $label . ' : option non reconnue.';
                         }
                         break;
                 }

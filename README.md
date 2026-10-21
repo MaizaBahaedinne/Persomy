@@ -122,6 +122,16 @@ Administration > **Blog** : articles multilingues (titre, chapeau, contenu, SEO,
 
 Les contenus visibles (coordonnées, textes, services…) sont en base et modifiables sans toucher au code. Le `.env` ne contient que l'infrastructure et les secrets.
 
+### SEO et GEO (moteurs de réponse IA)
+Fichiers générés automatiquement (aucun fichier statique à maintenir, à partir de `APP_URL` et de la base) :
+- `/robots.txt` : `/admin` interdit, lien vers le sitemap et `llms.txt`. La politique des robots IA (GPTBot, ClaudeBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, Google-Extended…) se règle dans **Administration > Réglages > Robots IA** : autoriser tout (défaut), assistants seulement (entraînement bloqué) ou tout bloquer.
+- `/sitemap.xml` : pages, projets, articles, avec `hreflang` FR/EN/AR et `x-default`.
+- `/llms.txt` (résumé et liens) et `/llms-full.txt` (contenu complet en Markdown) : langue par défaut ; les contenus « à compléter » et les projets de démonstration en sont exclus.
+- `/site.webmanifest` (statique) et `/{langue}/blog/rss.xml`.
+- Dans chaque page : `canonical`, `hreflang`, Open Graph, Twitter Card, `robots` (`max-image-preview:large`), et données structurées JSON-LD (`Organization` + `WebSite` sur l'accueil, `BreadcrumbList` partout, `Service` sur Services, `BlogPosting` sur les articles).
+
+Après mise en ligne : soumettre `https://votre-domaine.com/sitemap.xml` dans Google Search Console et Bing Webmaster Tools.
+
 ### Marqueurs « à compléter »
 Les informations officielles manquantes (e-mail, adresses Paris/Tunis, mission, valeurs, mentions légales, confidentialité) sont initialisées avec `[À COMPLÉTER …]`, `[TO BE COMPLETED …]`, `[يُستكمل لاحقًا …]`.
 Les coordonnées contenant un marqueur ne sont pas affichées publiquement ; les pages en contiennent encore tant qu'elles ne sont pas rédigées : le tableau de bord et la liste des pages les signalent. **Ne mettez pas en ligne avec des marqueurs restants** (en particulier mentions légales et confidentialité).
@@ -191,7 +201,7 @@ Les tests nécessitant la base et le serveur web (parcours complet) sont décrit
 - [ ] Projet publié visible ; brouillon introuvable (404) ; filtre par catégorie OK
 - [ ] Projet sans traduction arabe : bandeau de repli visible sur `/ar/portfolio/...`
 - [ ] 404 propre dans chaque langue ; aucune trace d'erreur PHP/SQL visible
-- [ ] `/sitemap.xml` et `/robots.txt` corrects (URL en https), balises canonical/hreflang présentes
+- [ ] `/sitemap.xml`, `/robots.txt` et `/llms.txt` corrects (URL en https), balises canonical/hreflang présentes, JSON-LD valide (validator.schema.org)
 
 **Contact**
 - [ ] Champs invalides refusés avec messages clairs ; valeurs conservées

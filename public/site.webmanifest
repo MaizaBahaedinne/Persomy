@@ -1,0 +1,14 @@
+{
+  "name": "Persomy — Digital Solutions",
+  "short_name": "Persomy",
+  "description": "Logiciels sur mesure, plateformes SaaS/PaaS, intelligence artificielle et automatisation.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "/assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/img/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

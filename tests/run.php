@@ -21,6 +21,7 @@ use App\Core\Router;
 use App\Models\Page;
 use App\Models\Project;
 use App\Services\Mailer;
+use App\Services\Seo;
 use App\Services\SqlSplitter;
 use App\Services\Uploader;
 
@@ -145,6 +146,36 @@ $blogRoute = Router::compile('/{lang:fr|en|ar}/blog/{slug:[a-z0-9]+(?:-[a-z0-9]+
 $check('blog: route article (slug valide uniquement)', preg_match($blogRoute, '/fr/blog/mon-article') === 1 && preg_match($blogRoute, '/fr/blog/rss.xml') !== 1);
 $blogSql = SqlSplitter::split((string) file_get_contents(BASE_PATH . '/database/migrations/002_create_blog.sql'));
 $check('blog: migration (4 tables)', count($blogSql) === 4);
+
+// --- SEO / GEO ---
+$robotsAllow = Seo::robotsTxt('allow', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');
+$robotsSearch = Seo::robotsTxt('search_only', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');
+$robotsBlock = Seo::robotsTxt('block', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');
+$check('robots: sitemap + /admin interdit', str_contains($robotsAllow, "Sitemap: https://x.test/sitemap.xml\n") && str_contains($robotsAllow, "User-agent: *\nDisallow: /admin\n"));
+$check('robots: mode allow autorise GPTBot et OAI-SearchBot', str_contains($robotsAllow, "User-agent: OAI-SearchBot\n") && str_contains($robotsAllow, "User-agent: Bytespider\nAllow: /\n"));
+$check('robots: search_only bloque l’entraînement', str_contains($robotsSearch, "User-agent: Bytespider\nDisallow: /\n") && str_contains($robotsSearch, "User-agent: Claude-User\nUser-agent: PerplexityBot\nUser-agent: Perplexity-User\nAllow: /\n"));
+$check('robots: block interdit aussi les assistants', str_contains($robotsBlock, "User-agent: Perplexity-User\nDisallow: /\n"));
+$check('robots: mode inconnu => allow', Seo::robotsTxt('??', 'a', 'b') === Seo::robotsTxt('allow', 'a', 'b'));
+$check('robots: /admin protégé dans les groupes IA', substr_count($robotsAllow, 'Disallow: /admin') === 3);
+
+$llms = Seo::llmsTxt([
+    'name' => 'Persomy', 'summary' => 'Résumé [x]  sur   deux', 'notes' => ['Bureaux : Paris'],
+    'sections' => ['Pages' => [['title' => 'À [propos]', 'url' => 'https://x.test/fr/about', 'desc' => 'Desc', 'body' => "## Titre\n\nTexte"]], 'Vide' => []],
+]);
+$check('llms: structure H1 + citation + liens', str_starts_with($llms, "# Persomy\n\n> Résumé x sur deux\n\n") && str_contains($llms, '- [À propos](https://x.test/fr/about): Desc') && !str_contains($llms, '## Vide'));
+$llmsFull = Seo::llmsTxt([
+    'name' => 'Persomy', 'summary' => '', 'notes' => [],
+    'sections' => ['Pages' => [['title' => 'A', 'url' => 'https://x.test/a', 'desc' => '', 'body' => "## Titre\n\n### Sous\n\nTexte"]]],
+], true);
+$check('llms-full: contenu avec titres décalés', str_contains($llmsFull, "### A\n\nSource: https://x.test/a\n\n#### Titre\n\n##### Sous\n\nTexte"));
+$crumbs = Seo::breadcrumbs([['Accueil', 'https://x.test/fr/'], ['Blog', 'https://x.test/fr/blog']]);
+$check('jsonld: fil d’Ariane (positions)', $crumbs['itemListElement'][1]['position'] === 2 && Seo::graph([$crumbs])['@context'] === 'https://schema.org');
+$nodes = Seo::siteNodes(['name' => 'Persomy', 'url' => 'https://x.test/', 'logo' => 'https://x.test/l.png', 'description' => '', 'locales' => ['fr'], 'email' => null, 'phone' => null, 'linkedin' => null, 'services' => [], 'offices' => [['Paris', 'FR', null]]]);
+$check('jsonld: organisation sans champ vide', !isset($nodes[0]['email'], $nodes[0]['sameAs'], $nodes[0]['description']) && $nodes[0]['location'][0]['address']['addressCountry'] === 'FR' && $nodes[1]['publisher']['@id'] === 'https://x.test/#organization');
+$encoded = json_encode(Seo::graph([['name' => '</script><script>alert(1)</script>']]), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$check('jsonld: balise script impossible à fermer', !str_contains((string) $encoded, '</script>') && !str_contains((string) $encoded, '<'));
+$manifest = json_decode((string) file_get_contents(BASE_PATH . '/public/site.webmanifest'), true);
+$check('manifest: valide + icônes existantes', is_array($manifest) && is_file(BASE_PATH . '/public' . $manifest['icons'][1]['src']));
 
 // --- Gabarits : aucun style/script en ligne (CSP stricte) ---
 $offenders = [];

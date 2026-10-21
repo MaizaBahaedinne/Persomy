@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Controllers\Admin;
 use App\Controllers\ContactController;
 use App\Controllers\PublicController;
+use App\Controllers\SeoController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\CsrfMiddleware;
 
@@ -17,7 +18,9 @@ $authPost = [AuthMiddleware::class, CsrfMiddleware::class];
 // --- Site public ---
 $router->get('/', [PublicController::class, 'root']);
 $router->get('/sitemap.xml', [PublicController::class, 'sitemap']);
-$router->get('/robots.txt', [PublicController::class, 'robots']);
+$router->get('/robots.txt', [SeoController::class, 'robots']);
+$router->get('/llms.txt', [SeoController::class, 'llms']);
+$router->get('/llms-full.txt', [SeoController::class, 'llmsFull']);
 
 $router->get($lang, [PublicController::class, 'home']);
 $router->get($lang . '/about', [PublicController::class, 'about']);

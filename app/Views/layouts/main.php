@@ -18,6 +18,7 @@ $description = (string) ($meta['description'] ?? '');
 $nav = (string) ($meta['nav'] ?? '');
 $locales = Config::get('locales', []);
 $image = !empty($meta['image']) ? abs_url($meta['image']) : null;
+$query = !empty($meta['query']) ? '?' . $meta['query'] : '';
 $gaId = (string) setting('analytics_id', '');
 $gaId = preg_match('/^G-[A-Z0-9]{6,14}$/', $gaId) ? $gaId : '';
 Response::$allowAnalytics = $gaId !== '';
@@ -43,20 +44,30 @@ $navItems = [
     <?php if ($path === null): ?><meta name="robots" content="noindex"><?php endif; ?>
 
     <?php if ($path !== null): ?>
-        <link rel="canonical" href="<?= e(abs_url(lurl($path))) ?>">
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+        <link rel="canonical" href="<?= e(abs_url(lurl($path)) . $query) ?>">
         <?php foreach ($locales as $code => $info): ?>
-            <link rel="alternate" hreflang="<?= e($code) ?>" href="<?= e(abs_url(lurl($path, $code))) ?>">
+            <link rel="alternate" hreflang="<?= e($code) ?>" href="<?= e(abs_url(lurl($path, $code)) . $query) ?>">
         <?php endforeach; ?>
-        <link rel="alternate" hreflang="x-default" href="<?= e(abs_url(lurl($path, Lang::defaultLocale()))) ?>">
+        <link rel="alternate" hreflang="x-default" href="<?= e(abs_url(lurl($path, Lang::defaultLocale())) . $query) ?>">
         <meta property="og:title" content="<?= e($title) ?>">
         <meta property="og:description" content="<?= e($description) ?>">
         <meta property="og:type" content="<?= e($meta['type'] ?? 'website') ?>">
-        <meta property="og:url" content="<?= e(abs_url(lurl($path))) ?>">
+        <meta property="og:url" content="<?= e(abs_url(lurl($path)) . $query) ?>">
         <meta property="og:site_name" content="<?= e($siteName) ?>">
         <meta property="og:locale" content="<?= e($locales[$loc]['og'] ?? 'fr_FR') ?>">
-        <?php if ($image): ?><meta property="og:image" content="<?= e($image) ?>"><?php endif; ?>
+        <?php foreach ($locales as $code => $info): ?>
+            <?php if ($code !== $loc): ?><meta property="og:locale:alternate" content="<?= e($info['og'] ?? '') ?>"><?php endif; ?>
+        <?php endforeach; ?>
+        <meta property="og:image" content="<?= e($image ?? abs_url('/assets/img/icon-512.png')) ?>">
+        <meta name="twitter:card" content="<?= $image ? 'summary_large_image' : 'summary' ?>">
+        <meta name="twitter:title" content="<?= e($title) ?>">
+        <meta name="twitter:description" content="<?= e($description) ?>">
+        <meta name="twitter:image" content="<?= e($image ?? abs_url('/assets/img/icon-512.png')) ?>">
         <?php if (!empty($meta['published_time'])): ?><meta property="article:published_time" content="<?= e(date('c', (int) strtotime((string) $meta['published_time']))) ?>"><?php endif; ?>
     <?php endif; ?>
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+    <link rel="manifest" href="/site.webmanifest">
     <link rel="alternate" type="application/rss+xml" title="<?= e($siteName . ' — ' . t('nav.blog')) ?>" href="<?= e(lurl('blog/rss.xml')) ?>">
     <?php if (!empty($meta['jsonld']) && is_array($meta['jsonld'])): ?>
         <script type="application/ld+json"><?= json_encode($meta['jsonld'], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?></script>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Lang;
+use App\Core\Logger;
 use App\Core\Request;
 use App\Core\Response;
 use App\Models\BlogCategory;
@@ -13,6 +14,7 @@ use App\Models\Category;
 use App\Models\Page;
 use App\Models\Project;
 use App\Models\Service;
+use App\Services\Seo;
 
 final class PublicController extends Controller
 {
@@ -41,13 +43,17 @@ final class PublicController extends Controller
         $locale = Lang::locale();
         $page = $this->page('home');
         $projects = Project::published($locale, null, 3, true) ?: Project::published($locale, null, 3);
+        $services = Service::localized($locale);
+
+        $meta = $this->meta($page, '', 'home', true);
+        $meta['jsonld'] = Seo::graph($this->siteNodes((string) $meta['description'], $services));
 
         return $this->view('public/home', [
-            'meta' => $this->meta($page, '', 'home', true),
+            'meta' => $meta,
             'page' => $page,
-            'services' => Service::localized($locale),
+            'services' => $services,
             'projects' => $projects,
-            'posts' => BlogPost::published($locale, null, 3),
+            'posts' => $this->safely(static fn(): array => BlogPost::published($locale, null, 3)),
         ]);
     }
 
@@ -60,10 +66,18 @@ final class PublicController extends Controller
     public function services(Request $request, array $params): Response
     {
         $page = $this->page('services');
+        $services = Service::localized(Lang::locale());
+        $meta = $this->meta($page, 'services', 'services');
+        if ($services) {
+            $meta['jsonld']['@graph'][] = Seo::serviceList(
+                array_map(static fn(array $s): array => [$s['t']['title'], (string) $s['t']['summary']], $services),
+                (string) setting('site_name', 'Persomy')
+            );
+        }
         return $this->view('public/services', [
-            'meta' => $this->meta($page, 'services', 'services'),
+            'meta' => $meta,
             'page' => $page,
-            'services' => Service::localized(Lang::locale()),
+            'services' => $services,
         ]);
     }
 
@@ -107,6 +121,11 @@ final class PublicController extends Controller
                 'nav' => 'portfolio',
                 'image' => $project['main_image'] ? '/uploads/projects/' . $project['main_image'] : null,
                 'type' => 'article',
+                'jsonld' => Seo::graph([Seo::breadcrumbs([
+                    [t('nav.home'), abs_url(lurl(''))],
+                    [t('nav.portfolio'), abs_url(lurl('portfolio'))],
+                    [$t['title'], abs_url(lurl('portfolio/' . $project['slug']))],
+                ])]),
             ],
             'project' => $project,
         ]);
@@ -132,8 +151,18 @@ final class PublicController extends Controller
         $current = min($pages, max(1, (int) $request->query('page')));
         $posts = BlogPost::published($locale, $selected, self::POSTS_PER_PAGE, ($current - 1) * self::POSTS_PER_PAGE);
 
+        // Canonical propre à chaque page filtrée/paginée ; titre distinct dès la page 2.
+        $meta = $this->meta($page, 'blog', 'blog');
+        $meta['query'] = http_build_query(array_filter(
+            ['category' => $selected, 'page' => $current > 1 ? $current : null],
+            static fn($v): bool => $v !== null
+        ));
+        if ($current > 1) {
+            $meta['title'] .= ' — ' . t('blog.page', ['n' => $current, 'total' => $pages]);
+        }
+
         return $this->view('public/blog', [
-            'meta' => $this->meta($page, 'blog', 'blog'),
+            'meta' => $meta,
             'page' => $page,
             'posts' => $posts,
             'categories' => $categories,
@@ -160,7 +189,6 @@ final class PublicController extends Controller
         $author = trim((string) $post['author']);
 
         $jsonld = [
-            '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
             'headline' => $t['title'],
             'description' => $description,
@@ -174,6 +202,11 @@ final class PublicController extends Controller
         if ($image !== null) {
             $jsonld['image'] = abs_url($image);
         }
+        $jsonld = Seo::graph([$jsonld, Seo::breadcrumbs([
+            [t('nav.home'), abs_url(lurl(''))],
+            [t('nav.blog'), abs_url(lurl('blog'))],
+            [$t['title'], abs_url(lurl($path))],
+        ])]);
 
         return $this->view('public/blog_post', [
             'meta' => [
@@ -232,12 +265,6 @@ final class PublicController extends Controller
         return $this->view('public/page', ['meta' => $this->meta($page, 'privacy', ''), 'page' => $page]);
     }
 
-    public function robots(Request $request, array $params): Response
-    {
-        $body = "User-agent: *\nDisallow: /admin\n\nSitemap: " . abs_url('/sitemap.xml') . "\n";
-        return Response::text($body);
-    }
-
     public function sitemap(Request $request, array $params): Response
     {
         $locales = Lang::supported();
@@ -254,7 +281,7 @@ final class PublicController extends Controller
         foreach (Project::published($default) as $project) {
             $entries[] = ['portfolio/' . $project['slug'], $project['updated_at']];
         }
-        foreach (BlogPost::sitemapEntries() as $post) {
+        foreach ($this->safely(static fn(): array => BlogPost::sitemapEntries()) as $post) {
             $entries[] = ['blog/' . $post['slug'], $post['updated_at']];
         }
 
@@ -291,12 +318,52 @@ final class PublicController extends Controller
     private function meta(array $page, string $path, string $nav, bool $fullTitle = false): array
     {
         $description = $page['meta_description'] !== '' ? $page['meta_description'] : truncate((string) $page['intro']);
-        return [
+        $meta = [
             'title' => $page['meta_title'] !== '' ? $page['meta_title'] : $page['title'],
             'full_title' => $fullTitle && $page['meta_title'] !== '',
             'description' => $description,
             'path' => $path,
             'nav' => $nav,
         ];
+        if ($path !== '') {
+            $meta['jsonld'] = Seo::graph([Seo::breadcrumbs([
+                [t('nav.home'), abs_url(lurl(''))],
+                [$page['title'], abs_url(lurl($path))],
+            ])]);
+        }
+        return $meta;
+    }
+
+    /** Organisation + site web (données structurées de la page d'accueil). */
+    private function siteNodes(string $description, array $services): array
+    {
+        $clean = static fn(?string $v): ?string => is_placeholder($v) ? null : trim((string) $v);
+        $linkedin = $clean(setting('linkedin_url'));
+        return Seo::siteNodes([
+            'name' => (string) setting('site_name', 'Persomy'),
+            'url' => abs_url('/'),
+            'logo' => abs_url('/assets/img/icon-512.png'),
+            'description' => has_placeholder($description) ? '' : $description,
+            'locales' => Lang::supported(),
+            'email' => $clean(setting('contact_email')),
+            'phone' => $clean(setting('contact_phone')),
+            'linkedin' => $linkedin !== null && str_starts_with($linkedin, 'https://') ? $linkedin : null,
+            'services' => array_map(static fn(array $s): string => $s['t']['title'], $services),
+            'offices' => [
+                ['Paris', 'FR', $clean(setting('address_paris'))],
+                ['Tunis', 'TN', $clean(setting('address_tunis'))],
+            ],
+        ]);
+    }
+
+    /** Exécute une lecture non essentielle (ex. blog avant migration) sans casser la page. */
+    private function safely(callable $read): array
+    {
+        try {
+            return $read();
+        } catch (\Throwable $e) {
+            Logger::error('Lecture optionnelle indisponible', ['error' => get_class($e)]);
+            return [];
+        }
     }
 }

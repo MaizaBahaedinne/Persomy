@@ -32,6 +32,12 @@ use App\Core\Lang;
                             <option value="<?= e($mode) ?>"<?= ($value === '' ? 'basic' : $value) === $mode ? ' selected' : '' ?>><?= e($modeLabel) ?></option>
                         <?php endforeach; ?>
                     </select>
+                <?php elseif ($type === 'ai_crawlers'): ?>
+                    <select id="s-<?= e($key) ?>" name="<?= e($key) ?>" aria-describedby="h-<?= e($key) ?>">
+                        <?php foreach (\App\Services\Seo::AI_MODES as $mode => $modeLabel): ?>
+                            <option value="<?= e($mode) ?>"<?= ($value === '' ? 'allow' : $value) === $mode ? ' selected' : '' ?>><?= e($modeLabel) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 <?php else: ?>
                     <input id="s-<?= e($key) ?>" name="<?= e($key) ?>" type="<?= $type === 'number' ? 'number' : 'text' ?>" maxlength="500" value="<?= e($value) ?>" aria-describedby="h-<?= e($key) ?>">
                 <?php endif; ?>

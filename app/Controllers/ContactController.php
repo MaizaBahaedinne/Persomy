@@ -17,6 +17,7 @@ use App\Models\Setting;
 use App\Models\Submission;
 use App\Services\Mailer;
 use App\Services\RateLimiter;
+use App\Services\Seo;
 
 final class ContactController extends Controller
 {
@@ -172,6 +173,10 @@ final class ContactController extends Controller
                 'description' => $description,
                 'path' => 'contact',
                 'nav' => 'contact',
+                'jsonld' => Seo::graph([Seo::breadcrumbs([
+                    [t('nav.home'), abs_url(lurl(''))],
+                    [$page['title'], abs_url(lurl('contact'))],
+                ])]),
             ],
             'page' => $page,
             'services' => Service::localized($locale),
