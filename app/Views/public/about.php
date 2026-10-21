@@ -19,6 +19,6 @@
             <h2><?= e(t('cta.discuss')) ?></h2>
             <p><?= e(t('cta.discuss_text')) ?></p>
         </div>
-        <a class="btn btn-light" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
+        <a class="btn btn-primary btn-arrow" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
     </div>
 </section>

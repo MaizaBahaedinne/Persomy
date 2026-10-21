@@ -19,8 +19,8 @@
             </div>
             <p class="hero-meta">
                 <span class="hero-meta-label"><?= e(t('footer.offices')) ?></span>
-                <span class="pill-dark">Paris</span>
-                <span class="pill-dark">Tunis</span>
+                <span class="pill">Paris</span>
+                <span class="pill">Tunis</span>
             </p>
             <?php $row = $page; require BASE_PATH . '/app/Views/partials/fallback.php'; ?>
         </div>
@@ -61,7 +61,7 @@
 </section>
 <?php endif; ?>
 
-<section class="section section-dark">
+<section class="section">
     <div class="container">
         <header class="section-head">
             <h2><?= e(t('home.method_title')) ?></h2>
@@ -84,6 +84,6 @@
             <h2><?= e(t('cta.discuss')) ?></h2>
             <p><?= e(t('cta.discuss_text')) ?></p>
         </div>
-        <a class="btn btn-light btn-arrow" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
+        <a class="btn btn-primary btn-arrow" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
     </div>
 </section>

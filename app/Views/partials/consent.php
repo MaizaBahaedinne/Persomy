@@ -7,7 +7,7 @@
         <p><?= e(t('consent.text')) ?> <a href="<?= e(lurl('privacy')) ?>"><?= e(t('consent.more')) ?></a></p>
     </div>
     <div class="consent-actions">
-        <button class="btn btn-outline-light" type="button" data-consent-choice="denied"><?= e(t('consent.refuse')) ?></button>
+        <button class="btn btn-outline" type="button" data-consent-choice="denied"><?= e(t('consent.refuse')) ?></button>
         <button class="btn btn-primary" type="button" data-consent-choice="granted"><?= e(t('consent.accept')) ?></button>
     </div>
 </div>

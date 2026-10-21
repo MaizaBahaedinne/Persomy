@@ -55,7 +55,7 @@ $navItems = [
         <meta property="og:locale" content="<?= e($locales[$loc]['og'] ?? 'fr_FR') ?>">
         <?php if ($image): ?><meta property="og:image" content="<?= e($image) ?>"><?php endif; ?>
     <?php endif; ?>
-    <meta name="theme-color" content="#050b1f">
+    <meta name="theme-color" content="#ffffff">
     <link rel="icon" href="<?= e(asset('img/favicon-32.png')) ?>" type="image/png" sizes="32x32">
     <link rel="icon" href="<?= e(asset('img/icon-192.png')) ?>" type="image/png" sizes="192x192">
     <link rel="apple-touch-icon" href="<?= e(asset('img/apple-touch-icon.png')) ?>">

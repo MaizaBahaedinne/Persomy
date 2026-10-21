@@ -1,8 +1,8 @@
 <?php
 /**
- * Logo du site (fond sombre : version claire).
+ * Logo du site (en-tête et pied de page clairs : version bleu nuit).
  * Fichier : public/assets/img/logo.webp (ou logo.svg / logo.png). Sans fichier, une marque temporaire est affichée.
- * logo-dark.webp = version bleu nuit pour fonds clairs (documents, e-mails).
+ * logo-light.webp = version blanche pour fonds sombres.
  */
 $logoFile = null;
 foreach (['logo.webp', 'logo.svg', 'logo.png'] as $candidate) {
