@@ -1,0 +1,16 @@
+# Persomy — réécriture quand le document root pointe vers public/ (configuration recommandée).
+# OpenLiteSpeed (CyberPanel) : si .htaccess n'est pas pris en compte, copier ces règles dans
+# vHost Conf > Rewrite (voir README, section « Déploiement CyberPanel »).
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

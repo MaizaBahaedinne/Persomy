@@ -1,0 +1,26 @@
+# Secrets et fichiers locaux
+.env
+.env.*
+!.env.example
+
+# Journaux, sessions, caches
+storage/logs/*
+storage/sessions/*
+storage/cache/*
+!storage/**/.gitkeep
+
+# Fichiers téléversés (contenus de production)
+public/uploads/projects/*
+!public/uploads/projects/.gitkeep
+
+# Sauvegardes, dumps SQL
+*.sql.gz
+*.dump
+backups/
+
+# Divers
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+vendor/

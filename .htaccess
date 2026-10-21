@@ -1,0 +1,24 @@
+# Persomy — REPLI SÉCURISÉ : à utiliser uniquement si le document root du domaine ne peut pas pointer vers public/.
+# Tout est servi depuis public/ ; le code, .env, storage/, database/ etc. ne sont jamais accessibles via le web.
+# Ce fichier est inutile (et sans effet) quand le document root est déjà public/.
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Interdit l'accès direct via /public/... (évite les doublons d'URL)
+    RewriteCond %{THE_REQUEST} \s/public(/|\s|\?)
+    RewriteRule ^ - [F]
+
+    # Fichiers statiques existants dans public/
+    RewriteCond %{DOCUMENT_ROOT}/public/$1 -f
+    RewriteRule ^(.+)$ public/$1 [L]
+
+    # Tout le reste passe par le contrôleur frontal
+    RewriteRule ^ public/index.php [L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
