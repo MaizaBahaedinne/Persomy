@@ -57,6 +57,7 @@ ul, ol { margin: 0; padding: 0; }
 .brand:hover { color: var(--white); }
 .brand-mark { flex: none; display: block; }
 .brand img { display: block; height: 40px; width: auto; max-width: 220px; object-fit: contain; }
+@media (max-width: 480px) { .brand img { height: 34px; } }
 .brand-text { font-weight: 800; letter-spacing: .2em; font-size: 1.05rem; }
 .site-nav { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
 .site-nav ul { list-style: none; display: flex; align-items: center; gap: .25rem; flex-wrap: wrap; }
@@ -288,6 +289,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--blue); outline: 
 .footer-legal { list-style: none; display: flex; gap: 1.25rem; }
 
 .error-page { min-height: 70vh; display: grid; align-items: center; }
+
+/* Bandeau de consentement (cookies de mesure d'audience) */
+.consent { position: fixed; inset-inline: 1rem; inset-block-end: 1rem; z-index: 90; display: flex; align-items: center; justify-content: space-between; gap: 1.25rem 2rem; flex-wrap: wrap; max-width: 960px; margin-inline: auto; padding: 1.25rem 1.5rem; background: rgba(3, 6, 15, .96); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: #dbe3f5; border: 1px solid var(--line-dark); border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+.consent[hidden] { display: none; }
+.consent :focus-visible { outline-color: var(--blue-light); }
+.consent-body { flex: 1 1 320px; }
+.consent-title { font-size: 1.05rem; color: var(--white); margin: 0 0 .25rem; letter-spacing: normal; }
+.consent p { margin: 0; font-size: .95rem; }
+.consent a { color: var(--blue-light); }
+.consent-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+.consent .btn { padding: .7rem 1.4rem; }
+.btn-outline-light { border-color: rgba(255, 255, 255, .45); color: var(--white); background: transparent; }
+.btn-outline-light:hover { background: rgba(255, 255, 255, .12); color: var(--white); }
+.link-button { background: none; border: 0; padding: 0; font: inherit; color: #bcc6de; cursor: pointer; }
+.link-button:hover { color: var(--white); text-decoration: underline; }
+.link-button[hidden] { display: none; }
 .debug { background: #111; color: #9f9; padding: 1rem; overflow: auto; font-size: .85rem; direction: ltr; text-align: left; }
 
 /* Apparition au défilement (classe ajoutée par app.js uniquement) */

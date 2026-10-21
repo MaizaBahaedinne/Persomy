@@ -1,4 +1,6 @@
 <?php
+use App\Core\Response;
+
 $siteName = (string) setting('site_name', 'Persomy');
 $email = setting('contact_email');
 $phone = setting('contact_phone');
@@ -9,7 +11,7 @@ $linkedin = setting('linkedin_url');
 <footer class="site-footer">
     <div class="container footer-grid">
         <div>
-            <p class="footer-brand"><?= e(mb_strtoupper($siteName)) ?></p>
+            <p class="footer-brand"><?php require BASE_PATH . '/app/Views/partials/brand.php'; ?></p>
             <p class="footer-text"><?= e(t('footer.tagline')) ?></p>
         </div>
         <div>
@@ -43,6 +45,9 @@ $linkedin = setting('linkedin_url');
         <ul class="footer-legal">
             <li><a href="<?= e(lurl('legal')) ?>"><?= e(t('footer.legal')) ?></a></li>
             <li><a href="<?= e(lurl('privacy')) ?>"><?= e(t('footer.privacy')) ?></a></li>
+            <?php if (Response::$allowAnalytics): ?>
+                <li><button class="link-button" type="button" data-consent-open hidden><?= e(t('consent.manage')) ?></button></li>
+            <?php endif; ?>
         </ul>
     </div>
 </footer>

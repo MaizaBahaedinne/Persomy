@@ -29,7 +29,7 @@ $items = [
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($title) ?> — Administration Persomy</title>
-    <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
+    <link rel="icon" href="<?= e(asset('img/favicon-32.png')) ?>" type="image/png" sizes="32x32">
     <link rel="stylesheet" href="<?= e(asset('css/admin.css')) ?>">
     <script src="<?= e(asset('js/admin.js')) ?>" defer></script>
 </head>

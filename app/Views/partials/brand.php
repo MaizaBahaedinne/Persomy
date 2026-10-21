@@ -1,7 +1,8 @@
 <?php
 /**
- * Emplacement TEMPORAIRE du logo.
- * Pour installer le logo officiel : déposer public/assets/img/logo.webp (ou logo.svg / logo.png) ; il sera utilisé automatiquement.
+ * Logo du site (fond sombre : version claire).
+ * Fichier : public/assets/img/logo.webp (ou logo.svg / logo.png). Sans fichier, une marque temporaire est affichée.
+ * logo-dark.webp = version bleu nuit pour fonds clairs (documents, e-mails).
  */
 $logoFile = null;
 foreach (['logo.webp', 'logo.svg', 'logo.png'] as $candidate) {
@@ -14,7 +15,7 @@ $brandName = (string) setting('site_name', 'Persomy');
 ?>
 <a class="brand" href="<?= e(lurl('')) ?>">
     <?php if ($logoFile): ?>
-        <img src="<?= e(asset('img/' . $logoFile)) ?>" alt="<?= e($brandName) ?>" height="32">
+        <img src="<?= e(asset('img/' . $logoFile)) ?>" alt="<?= e($brandName) ?>" width="162" height="40" decoding="async">
     <?php else: ?>
         <svg class="brand-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
             <defs><linearGradient id="bm-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b73ff"/><stop offset="1" stop-color="#0f3fcc"/></linearGradient></defs>

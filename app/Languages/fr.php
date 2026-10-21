@@ -35,6 +35,14 @@ return [
         'privacy' => 'Politique de confidentialité',
         'rights' => 'Tous droits réservés.',
     ],
+    'consent' => [
+        'title' => 'Cookies et mesure d’audience',
+        'text' => 'Nous utilisons Google Analytics pour mesurer la fréquentation du site. Aucun cookie de mesure n’est déposé sans votre accord.',
+        'accept' => 'Accepter',
+        'refuse' => 'Refuser',
+        'manage' => 'Gérer les cookies',
+        'more' => 'En savoir plus',
+    ],
     'home' => [
         'expertise_title' => 'Nos expertises',
         'expertise_intro' => 'Des solutions numériques conçues autour de vos besoins, de la conception à l’exploitation.',

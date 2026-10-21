@@ -6,6 +6,7 @@
 
 use App\Core\Config;
 use App\Core\Lang;
+use App\Core\Response;
 
 $loc = Lang::locale();
 $dir = Lang::dir();
@@ -17,6 +18,9 @@ $description = (string) ($meta['description'] ?? '');
 $nav = (string) ($meta['nav'] ?? '');
 $locales = Config::get('locales', []);
 $image = !empty($meta['image']) ? abs_url($meta['image']) : null;
+$gaId = (string) setting('analytics_id', '');
+$gaId = preg_match('/^G-[A-Z0-9]{6,14}$/', $gaId) ? $gaId : '';
+Response::$allowAnalytics = $gaId !== '';
 
 $navItems = [
     'home' => '',
@@ -51,11 +55,14 @@ $navItems = [
         <?php if ($image): ?><meta property="og:image" content="<?= e($image) ?>"><?php endif; ?>
     <?php endif; ?>
     <meta name="theme-color" content="#050b1f">
-    <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
+    <link rel="icon" href="<?= e(asset('img/favicon-32.png')) ?>" type="image/png" sizes="32x32">
+    <link rel="icon" href="<?= e(asset('img/icon-192.png')) ?>" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="<?= e(asset('img/apple-touch-icon.png')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
+    <?php if ($gaId !== ''): ?><script src="<?= e(asset('js/consent.js')) ?>" defer></script><?php endif; ?>
 </head>
-<body>
+<body<?= $gaId !== '' ? ' data-ga-id="' . e($gaId) . '"' : '' ?>>
 <a class="skip-link" href="#main"><?= e(t('common.skip')) ?></a>
 
 <header class="site-header" data-header>
@@ -92,5 +99,6 @@ $navItems = [
 </main>
 
 <?php require BASE_PATH . '/app/Views/partials/footer.php'; ?>
+<?php if ($gaId !== ''): require BASE_PATH . '/app/Views/partials/consent.php'; endif; ?>
 </body>
 </html>

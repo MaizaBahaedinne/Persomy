@@ -22,6 +22,7 @@ final class SettingController extends AdminController
         'address_paris' => ['Adresse du bureau de Paris', 'textarea', 'Facultatif. Ne publier que des informations confirmées.'],
         'address_tunis' => ['Adresse du bureau de Tunis', 'textarea', 'Facultatif. Ne publier que des informations confirmées.'],
         'linkedin_url' => ['Lien LinkedIn', 'url', 'URL complète en https://.'],
+        'analytics_id' => ['Google Analytics (identifiant de mesure)', 'ga_id', 'Format G-XXXXXXXXXX. Laisser vide pour désactiver. Le suivi ne démarre qu’après acceptation du visiteur (bandeau cookies). Mentionner Google Analytics dans la politique de confidentialité.'],
         'contact_retention_days' => ['Conservation des demandes (jours)', 'number', 'Les demandes plus anciennes peuvent être purgées depuis « Messages ».'],
     ];
 
@@ -60,6 +61,11 @@ final class SettingController extends AdminController
                     case 'locale':
                         if (!Lang::isSupported($value)) {
                             $errors[] = $label . ' : langue non prise en charge.';
+                        }
+                        break;
+                    case 'ga_id':
+                        if (!preg_match('/^G-[A-Z0-9]{6,14}$/', $value)) {
+                            $errors[] = $label . ' : format attendu G-XXXXXXXXXX.';
                         }
                         break;
                 }

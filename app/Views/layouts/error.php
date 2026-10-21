@@ -17,7 +17,8 @@ $loc = Lang::locale();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <title><?= e((string) ($meta['title'] ?? 'Error')) ?></title>
-    <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
+    <link rel="icon" href="<?= e(asset('img/favicon-32.png')) ?>" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="<?= e(asset('img/apple-touch-icon.png')) ?>">
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>">
 </head>
 <body>

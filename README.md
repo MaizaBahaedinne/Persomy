@@ -124,7 +124,7 @@ Les informations officielles manquantes (e-mail, adresses Paris/Tunis, mission, 
 Les coordonnées contenant un marqueur ne sont pas affichées publiquement ; les pages en contiennent encore tant qu'elles ne sont pas rédigées : le tableau de bord et la liste des pages les signalent. **Ne mettez pas en ligne avec des marqueurs restants** (en particulier mentions légales et confidentialité).
 
 ### Logo
-Déposez le logo officiel dans `public/assets/img/logo.webp` (ou `logo.svg` / `logo.png`) : il remplace automatiquement le texte provisoire. Le favicon `public/assets/img/favicon.svg` est provisoire.
+Déposez le logo officiel dans `public/assets/img/logo.webp` (ou `logo.svg` / `logo.png`) : il remplace automatiquement le texte provisoire. Le logo doit être **clair sur fond transparent** (l'en-tête et le pied de page sont sombres) ; `logo-dark.webp` est la variante bleu nuit pour fonds clairs. Favicons : `favicon-32.png`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`.
 
 ## Langues et RTL
 

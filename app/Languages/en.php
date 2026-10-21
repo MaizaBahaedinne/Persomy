@@ -35,6 +35,14 @@ return [
         'privacy' => 'Privacy policy',
         'rights' => 'All rights reserved.',
     ],
+    'consent' => [
+        'title' => 'Cookies and audience measurement',
+        'text' => 'We use Google Analytics to measure site traffic. No measurement cookie is set without your consent.',
+        'accept' => 'Accept',
+        'refuse' => 'Decline',
+        'manage' => 'Manage cookies',
+        'more' => 'Learn more',
+    ],
     'home' => [
         'expertise_title' => 'Our expertise',
         'expertise_intro' => 'Digital solutions built around your needs, from design to operation.',
