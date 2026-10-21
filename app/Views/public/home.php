@@ -28,6 +28,30 @@
     </div>
 </section>
 
+<?php if (!empty($clients)):
+    // Chaque groupe doit être plus large que l’écran pour que la boucle soit continue.
+    $repeat = max(1, (int) ceil(12 / count($clients)));
+    $long = count($clients) * $repeat > 20;
+    ?>
+<section class="logos" aria-labelledby="clients-title">
+    <h2 id="clients-title" class="logos-title"><?= e(t('home.clients_title')) ?></h2>
+    <div class="logo-marquee<?= $long ? ' is-long' : '' ?>">
+        <?php for ($g = 0; $g < 2; $g++): ?>
+            <ul class="logo-group"<?= $g === 1 ? ' aria-hidden="true"' : '' ?>>
+                <?php for ($r = 0; $r < $repeat; $r++): ?>
+                    <?php foreach ($clients as $client): ?>
+                        <?php $dup = $g === 1 || $r > 0; ?>
+                        <li class="logo-item<?= $dup ? ' logo-dup' : '' ?>"<?= $dup && $g === 0 ? ' aria-hidden="true"' : '' ?>>
+                            <img src="<?= e('/uploads/clients/' . $client['logo']) ?>" alt="<?= $dup ? '' : e($client['name']) ?>" height="48" decoding="async">
+                        </li>
+                    <?php endforeach; ?>
+                <?php endfor; ?>
+            </ul>
+        <?php endfor; ?>
+    </div>
+</section>
+<?php endif; ?>
+
 <?php if ($services): ?>
 <section class="section">
     <div class="container">

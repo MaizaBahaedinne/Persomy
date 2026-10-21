@@ -14,7 +14,7 @@ final class Uploader
     public const DIR = '/public/uploads/projects';
 
     /** Sous-dossiers autorisés dans public/uploads (jamais issus d'une saisie utilisateur). */
-    private const FOLDERS = ['projects', 'blog'];
+    private const FOLDERS = ['projects', 'blog', 'clients'];
 
     private static function folder(string $folder): string
     {

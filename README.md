@@ -122,6 +122,9 @@ Administration > **Blog** : articles multilingues (titre, chapeau, contenu, SEO,
 
 Les contenus visibles (coordonnées, textes, services…) sont en base et modifiables sans toucher au code. Le `.env` ne contient que l'infrastructure et les secrets.
 
+### Logos clients (accueil)
+Administration > **Projets** > fiche d'un projet > « Logo du client » (nom + image PNG/WebP/JPEG). Les logos des projets **publiés** défilent automatiquement dans un carrousel sur la page d'accueil (pause au survol, statique si l'utilisateur réduit les animations, un seul logo par client). Après mise à jour : `php bin/migrate.php` (applique `003_project_client_logo.sql`), puis `chown` sur `public/uploads/clients` pour l'utilisateur du site si le dossier existe déjà avec un autre propriétaire.
+
 ### SEO et GEO (moteurs de réponse IA)
 Fichiers générés automatiquement (aucun fichier statique à maintenir, à partir de `APP_URL` et de la base) :
 - `/robots.txt` : `/admin` interdit, lien vers le sitemap et `llms.txt`. La politique des robots IA (GPTBot, ClaudeBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, Google-Extended…) se règle dans **Administration > Réglages > Robots IA** : autoriser tout (défaut), assistants seulement (entraînement bloqué) ou tout bloquer.

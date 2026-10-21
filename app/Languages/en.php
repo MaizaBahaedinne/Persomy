@@ -49,6 +49,7 @@ return [
         'expertise_intro' => 'Digital solutions built around your needs, from design to operation.',
         'featured_title' => 'Featured projects',
         'featured_intro' => 'A selection of work presented with the consent of the parties involved.',
+        'clients_title' => 'Trusted by',
         'method_title' => 'How we work',
         'method_intro' => 'A simple, transparent and incremental approach.',
         'step1' => ['title' => 'Listening and scoping', 'text' => 'We analyse your needs, constraints and objectives.'],

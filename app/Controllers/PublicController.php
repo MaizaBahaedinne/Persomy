@@ -53,6 +53,7 @@ final class PublicController extends Controller
             'page' => $page,
             'services' => $services,
             'projects' => $projects,
+            'clients' => $this->safely(static fn(): array => Project::clientLogos()),
             'posts' => $this->safely(static fn(): array => BlogPost::published($locale, null, 3)),
         ]);
     }

@@ -9,6 +9,7 @@
  */
 $action = $project ? '/admin/projects/' . (int) $project['id'] : '/admin/projects';
 $image = $values['main_image'] ?? null;
+$clientLogo = $values['client_logo'] ?? null;
 ?>
 <?php require BASE_PATH . '/app/Views/admin/partials/errors.php'; ?>
 <form method="post" action="<?= e($action) ?>" enctype="multipart/form-data" class="stack">
@@ -62,6 +63,26 @@ $image = $values['main_image'] ?? null;
         <div class="field">
             <label for="image">Téléverser une image (JPEG, PNG ou WebP, 5 Mo max.)</label>
             <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp">
+        </div>
+    </fieldset>
+
+    <fieldset class="box">
+        <legend>Logo du client</legend>
+        <p class="help">Affiché dans le carrousel de logos de la page d’accueil lorsque le projet est <strong>publié</strong>. Privilégiez un logo PNG ou WebP à fond transparent.</p>
+        <div class="field">
+            <label for="client_name">Nom du client (texte alternatif du logo)</label>
+            <input id="client_name" name="client_name" type="text" maxlength="120" value="<?= e($values['client_name'] ?? '') ?>">
+        </div>
+        <?php if ($clientLogo): ?>
+            <p><img class="thumb" src="<?= e('/uploads/clients/' . $clientLogo) ?>" alt="Logo actuel"></p>
+            <div class="field field-check">
+                <input id="remove_client_logo" name="remove_client_logo" type="checkbox" value="1">
+                <label for="remove_client_logo">Supprimer le logo actuel</label>
+            </div>
+        <?php endif; ?>
+        <div class="field">
+            <label for="client_logo">Téléverser un logo (JPEG, PNG ou WebP, 5 Mo max.)</label>
+            <input id="client_logo" name="client_logo" type="file" accept="image/jpeg,image/png,image/webp">
         </div>
     </fieldset>
 

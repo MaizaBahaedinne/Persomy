@@ -146,6 +146,16 @@ $blogRoute = Router::compile('/{lang:fr|en|ar}/blog/{slug:[a-z0-9]+(?:-[a-z0-9]+
 $check('blog: route article (slug valide uniquement)', preg_match($blogRoute, '/fr/blog/mon-article') === 1 && preg_match($blogRoute, '/fr/blog/rss.xml') !== 1);
 $blogSql = SqlSplitter::split((string) file_get_contents(BASE_PATH . '/database/migrations/002_create_blog.sql'));
 $check('blog: migration (4 tables)', count($blogSql) === 4);
+$logoSql = SqlSplitter::split((string) file_get_contents(BASE_PATH . '/database/migrations/003_project_client_logo.sql'));
+$check('logos clients: migration (1 instruction, 2 colonnes)', count($logoSql) === 1 && str_contains($logoSql[0], 'client_name') && str_contains($logoSql[0], 'client_logo'));
+$check('logos clients: dossier d’upload autorisé', (static function (): bool {
+    try {
+        Uploader::delete(str_repeat('a', 32) . '.png', 'clients');
+        return true;
+    } catch (\InvalidArgumentException) {
+        return false;
+    }
+})());
 
 // --- SEO / GEO ---
 $robotsAllow = Seo::robotsTxt('allow', 'https://x.test/sitemap.xml', 'https://x.test/llms.txt');

@@ -53,6 +53,32 @@ final class Project extends TranslatedModel
         return $list[0] ?? null;
     }
 
+    /**
+     * Logos clients des projets publiés (carrousel de l'accueil), un seul par client nommé.
+     *
+     * @return list<array{name: string, logo: string}>
+     */
+    public static function clientLogos(): array
+    {
+        $rows = Db::all(
+            'SELECT client_name, client_logo FROM projects
+             WHERE status = \'published\' AND client_logo IS NOT NULL AND client_logo <> \'\'
+             ORDER BY sort_order ASC, id ASC'
+        );
+        $out = [];
+        $seen = [];
+        foreach ($rows as $row) {
+            $name = trim((string) $row['client_name']);
+            $key = $name !== '' ? mb_strtolower($name) : (string) $row['client_logo'];
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $out[] = ['name' => $name, 'logo' => (string) $row['client_logo']];
+        }
+        return $out;
+    }
+
     private static function withCategoryNames(array $projects, string $locale): array
     {
         if (!$projects) {
@@ -97,18 +123,20 @@ final class Project extends TranslatedModel
                 'demo' => $data['is_demo'] ? 1 : 0,
                 'featured' => $data['featured'] ? 1 : 0,
                 'image' => $data['main_image'],
+                'client_name' => $data['client_name'],
+                'client_logo' => $data['client_logo'],
                 'sort' => $data['sort_order'],
             ];
             if ($id === null) {
                 $id = Db::insert(
-                    'INSERT INTO projects (slug, category_id, status, is_demo, featured, main_image, sort_order, published_at)
-                     VALUES (:slug, :category, :status, :demo, :featured, :image, :sort, ' . ($data['status'] === 'published' ? 'NOW()' : 'NULL') . ')',
+                    'INSERT INTO projects (slug, category_id, status, is_demo, featured, main_image, client_name, client_logo, sort_order, published_at)
+                     VALUES (:slug, :category, :status, :demo, :featured, :image, :client_name, :client_logo, :sort, ' . ($data['status'] === 'published' ? 'NOW()' : 'NULL') . ')',
                     $params
                 );
             } else {
                 Db::run(
                     'UPDATE projects SET slug = :slug, category_id = :category, status = :status, is_demo = :demo,
-                     featured = :featured, main_image = :image, sort_order = :sort'
+                     featured = :featured, main_image = :image, client_name = :client_name, client_logo = :client_logo, sort_order = :sort'
                     . ($data['status'] === 'published' ? ', published_at = COALESCE(published_at, NOW())' : '')
                     . ' WHERE id = :id',
                     $params + ['id' => $id]

@@ -14,6 +14,8 @@ public/uploads/projects/*
 !public/uploads/projects/.gitkeep
 public/uploads/blog/*
 !public/uploads/blog/.gitkeep
+public/uploads/clients/*
+!public/uploads/clients/.gitkeep
 
 # Sauvegardes, dumps SQL
 *.sql.gz

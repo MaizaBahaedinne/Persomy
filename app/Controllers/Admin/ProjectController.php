@@ -32,6 +32,7 @@ final class ProjectController extends AdminController
     {
         return $this->form(null, [
             'slug' => '', 'category_id' => '', 'status' => 'draft', 'is_demo' => 0, 'featured' => 0, 'sort_order' => 0, 'main_image' => null,
+            'client_name' => '', 'client_logo' => null,
         ], [], [], 200);
     }
 
@@ -69,6 +70,7 @@ final class ProjectController extends AdminController
         $project = Project::find($id) ?? $this->abort(404);
         Project::delete($id);
         Uploader::delete($project['main_image']);
+        Uploader::delete($project['client_logo'] ?? null, 'clients');
         $this->success('Projet supprimé.');
         return $this->redirect('/admin/projects');
     }
@@ -107,6 +109,10 @@ final class ProjectController extends AdminController
         }
         $status = $request->input('status') === 'published' ? 'published' : 'draft';
         $sort = (int) $request->input('sort_order', '0');
+        $clientName = trim($request->input('client_name'));
+        if (mb_strlen($clientName) > 120) {
+            $errors[] = 'Le nom du client est trop long (120 caractères maximum).';
+        }
 
         $data = [
             'slug' => $slug,
@@ -116,28 +122,31 @@ final class ProjectController extends AdminController
             'featured' => $this->checkbox($request, 'featured'),
             'sort_order' => max(-9999, min(9999, $sort)),
             'main_image' => $existing['main_image'] ?? null,
+            'client_name' => $clientName !== '' ? $clientName : null,
+            'client_logo' => $existing['client_logo'] ?? null,
         ];
 
-        // Image : validation stricte avant toute écriture en base.
-        $newImage = null;
-        $upload = $request->file('image');
-        if ($upload !== null && (int) $upload['error'] !== UPLOAD_ERR_NO_FILE && !$errors) {
-            try {
-                $newImage = Uploader::saveImage($upload);
-            } catch (\RuntimeException $e) {
-                $errors[] = $e->getMessage();
-            }
-        } elseif ($upload !== null && (int) $upload['error'] !== UPLOAD_ERR_NO_FILE) {
-            $errors[] = 'Corrigez les erreurs puis sélectionnez de nouveau l’image.';
-        }
+        // Images : validation stricte avant toute écriture en base.
+        $newImage = $this->receiveImage($request, 'image', 'projects', $errors);
+        $newLogo = $this->receiveImage($request, 'client_logo', 'clients', $errors);
         $oldImage = $existing['main_image'] ?? null;
+        $oldLogo = $existing['client_logo'] ?? null;
         if ($newImage !== null) {
             $data['main_image'] = $newImage;
         } elseif ($this->checkbox($request, 'remove_image')) {
             $data['main_image'] = null;
         }
+        if ($newLogo !== null) {
+            $data['client_logo'] = $newLogo;
+        } elseif ($this->checkbox($request, 'remove_client_logo')) {
+            $data['client_logo'] = null;
+        }
 
         if ($errors) {
+            Uploader::delete($newImage);
+            Uploader::delete($newLogo, 'clients');
+            $data['main_image'] = $oldImage;
+            $data['client_logo'] = $oldLogo;
             return $this->form($existing, $data + ['id' => $id], $translations, $errors, 422);
         }
 
@@ -145,17 +154,44 @@ final class ProjectController extends AdminController
             Project::save($id, $data, $translations);
         } catch (\Throwable $e) {
             Logger::error('Project save failed', ['error' => get_class($e)]);
-            if ($newImage !== null) {
-                Uploader::delete($newImage);
-            }
-            return $this->form($existing, $data + ['id' => $id], $translations, ['Erreur technique : le projet n’a pas pu être enregistré.'], 500);
+            Uploader::delete($newImage);
+            Uploader::delete($newLogo, 'clients');
+            $data['main_image'] = $oldImage;
+            $data['client_logo'] = $oldLogo;
+            return $this->form($existing, $data + ['id' => $id], $translations, ['Erreur technique : le projet n’a pas pu être enregistré. Les migrations sont-elles à jour (php bin/migrate.php) ?'], 500);
         }
 
         if ($oldImage !== null && $data['main_image'] !== $oldImage) {
             Uploader::delete($oldImage);
         }
+        if ($oldLogo !== null && $data['client_logo'] !== $oldLogo) {
+            Uploader::delete($oldLogo, 'clients');
+        }
         $this->success('Projet enregistré.');
         return $this->redirect('/admin/projects');
+    }
+
+    /**
+     * Valide et enregistre un fichier image téléversé (null si aucun fichier ou en cas d'erreur).
+     *
+     * @param list<string> $errors
+     */
+    private function receiveImage(Request $request, string $field, string $folder, array &$errors): ?string
+    {
+        $upload = $request->file($field);
+        if ($upload === null || (int) $upload['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        if ($errors) {
+            $errors[] = 'Corrigez les erreurs puis sélectionnez de nouveau le fichier (' . $field . ').';
+            return null;
+        }
+        try {
+            return Uploader::saveImage($upload, $folder);
+        } catch (\RuntimeException $e) {
+            $errors[] = $e->getMessage();
+            return null;
+        }
     }
 
     private function form(?array $project, array $values, array $tr, array $errors, int $status): Response

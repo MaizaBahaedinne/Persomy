@@ -49,6 +49,7 @@ return [
         'expertise_intro' => 'Des solutions numériques conçues autour de vos besoins, de la conception à l’exploitation.',
         'featured_title' => 'Projets à la une',
         'featured_intro' => 'Une sélection de réalisations présentées avec l’accord des parties concernées.',
+        'clients_title' => 'Ils nous font confiance',
         'method_title' => 'Notre façon de travailler',
         'method_intro' => 'Une démarche simple, transparente et progressive.',
         'step1' => ['title' => 'Écoute et cadrage', 'text' => 'Nous analysons votre besoin, vos contraintes et vos objectifs.'],
