@@ -26,6 +26,12 @@ use App\Core\Lang;
                             <option value="<?= e($code) ?>"<?= $value === $code ? ' selected' : '' ?>><?= e($info['name']) ?> (<?= e($code) ?>)</option>
                         <?php endforeach; ?>
                     </select>
+                <?php elseif ($type === 'consent_mode'): ?>
+                    <select id="s-<?= e($key) ?>" name="<?= e($key) ?>" aria-describedby="h-<?= e($key) ?>">
+                        <?php foreach (\App\Controllers\Admin\SettingController::CONSENT_MODES as $mode => $modeLabel): ?>
+                            <option value="<?= e($mode) ?>"<?= ($value === '' ? 'basic' : $value) === $mode ? ' selected' : '' ?>><?= e($modeLabel) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 <?php else: ?>
                     <input id="s-<?= e($key) ?>" name="<?= e($key) ?>" type="<?= $type === 'number' ? 'number' : 'text' ?>" maxlength="500" value="<?= e($value) ?>" aria-describedby="h-<?= e($key) ?>">
                 <?php endif; ?>

@@ -12,6 +12,12 @@ use App\Models\Setting;
 
 final class SettingController extends AdminController
 {
+    /** Modes du Consent Mode v2. */
+    public const CONSENT_MODES = [
+        'basic' => 'Basique (recommandé) : aucun script Google n’est chargé avant l’accord du visiteur',
+        'advanced' => 'Avancé : Google est chargé dès l’arrivée, en mode refusé (pings sans cookie, modélisation des conversions)',
+    ];
+
     /** Réglages éditables : clé => [libellé, type, aide]. Aucun secret ici (SMTP, base : voir .env). */
     public const FIELDS = [
         'site_name' => ['Nom du site', 'text', 'Affiché dans le titre, l’en-tête et le pied de page.'],
@@ -22,7 +28,8 @@ final class SettingController extends AdminController
         'address_paris' => ['Adresse du bureau de Paris', 'textarea', 'Facultatif. Ne publier que des informations confirmées.'],
         'address_tunis' => ['Adresse du bureau de Tunis', 'textarea', 'Facultatif. Ne publier que des informations confirmées.'],
         'linkedin_url' => ['Lien LinkedIn', 'url', 'URL complète en https://.'],
-        'analytics_id' => ['Google Analytics (identifiant de mesure)', 'ga_id', 'Format G-XXXXXXXXXX. Laisser vide pour désactiver. Le suivi ne démarre qu’après acceptation du visiteur (bandeau cookies). Mentionner Google Analytics dans la politique de confidentialité.'],
+        'analytics_id' => ['Google Analytics (identifiant de mesure)', 'ga_id', 'Format G-XXXXXXXXXX. Laisser vide pour désactiver. Mentionner Google Analytics dans la politique de confidentialité.'],
+        'consent_mode' => ['Mode de consentement Google', 'consent_mode', 'Google Consent Mode v2 : tout est refusé par défaut, le choix du visiteur met à jour les autorisations.'],
         'contact_retention_days' => ['Conservation des demandes (jours)', 'number', 'Les demandes plus anciennes peuvent être purgées depuis « Messages ».'],
     ];
 
@@ -66,6 +73,11 @@ final class SettingController extends AdminController
                     case 'ga_id':
                         if (!preg_match('/^G-[A-Z0-9]{6,14}$/', $value)) {
                             $errors[] = $label . ' : format attendu G-XXXXXXXXXX.';
+                        }
+                        break;
+                    case 'consent_mode':
+                        if (!isset(self::CONSENT_MODES[$value])) {
+                            $errors[] = $label . ' : mode non reconnu.';
                         }
                         break;
                 }

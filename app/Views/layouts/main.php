@@ -21,6 +21,7 @@ $image = !empty($meta['image']) ? abs_url($meta['image']) : null;
 $gaId = (string) setting('analytics_id', '');
 $gaId = preg_match('/^G-[A-Z0-9]{6,14}$/', $gaId) ? $gaId : '';
 Response::$allowAnalytics = $gaId !== '';
+$consentMode = (string) setting('consent_mode', 'basic') === 'advanced' ? 'advanced' : 'basic';
 
 $navItems = [
     'home' => '',
@@ -62,7 +63,7 @@ $navItems = [
     <script src="<?= e(asset('js/app.js')) ?>" defer></script>
     <?php if ($gaId !== ''): ?><script src="<?= e(asset('js/consent.js')) ?>" defer></script><?php endif; ?>
 </head>
-<body<?= $gaId !== '' ? ' data-ga-id="' . e($gaId) . '"' : '' ?>>
+<body<?= $gaId !== '' ? ' data-ga-id="' . e($gaId) . '" data-consent-mode="' . e($consentMode) . '"' : '' ?>>
 <a class="skip-link" href="#main"><?= e(t('common.skip')) ?></a>
 
 <header class="site-header" data-header>
