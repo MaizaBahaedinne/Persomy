@@ -77,7 +77,7 @@ final class BlogPostController extends AdminController
         $existing = $id !== null ? (BlogPost::find($id) ?? $this->abort(404)) : null;
         $errors = [];
 
-        $slug = $request->input('slug');
+        $slug = slugify($request->input('slug'));
         [$translations, $trError] = BlogPost::cleanTranslations($request->arrayInput('tr'), self::LIMITS);
         if ($trError !== null) {
             $errors[] = $trError;

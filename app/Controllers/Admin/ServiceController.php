@@ -61,7 +61,7 @@ final class ServiceController extends AdminController
         if ($trError !== null) {
             $errors[] = $trError;
         }
-        $slug = $request->input('slug');
+        $slug = slugify($request->input('slug'));
         if ($slug === '') {
             foreach (Lang::supported() as $locale) {
                 if (($translations[$locale]['title'] ?? '') !== '') {

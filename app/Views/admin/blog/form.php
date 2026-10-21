@@ -19,7 +19,7 @@ $publishedAt = !empty($values['published_at']) ? date('Y-m-d\TH:i', (int) strtot
         <div class="field">
             <label for="slug">Identifiant d’URL</label>
             <input id="slug" name="slug" type="text" maxlength="120" value="<?= e($values['slug'] ?? '') ?>" aria-describedby="slug-help">
-            <p class="help" id="slug-help">Minuscules, chiffres et tirets. Laissez vide pour le générer depuis le titre.</p>
+            <p class="help" id="slug-help">Minuscules, chiffres et tirets (les autres caractères, comme les points, sont convertis en tirets). Laissez vide pour le générer depuis le titre.</p>
         </div>
         <div class="field">
             <label for="category_id">Catégorie</label>
