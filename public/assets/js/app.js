@@ -19,6 +19,20 @@
     });
   }
 
+  // Sélecteur de langue : se ferme au clic extérieur et avec Échap.
+  var langMenu = document.querySelector('[data-lang-menu]');
+  if (langMenu) {
+    document.addEventListener('click', function (event) {
+      if (langMenu.open && !langMenu.contains(event.target)) { langMenu.open = false; }
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && langMenu.open) {
+        langMenu.open = false;
+        langMenu.querySelector('summary').focus();
+      }
+    });
+  }
+
   // Apparition douce au défilement (désactivée si l'utilisateur réduit les animations).
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

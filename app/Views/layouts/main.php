@@ -100,14 +100,19 @@ $navItems = [
                     </li>
                 <?php endforeach; ?>
             </ul>
-            <ul class="lang-switch" aria-label="<?= e(t('common.language')) ?>">
-                <?php foreach ($locales as $code => $info): ?>
-                    <li>
-                        <a href="<?= e(lurl((string) $path, $code)) ?>" lang="<?= e($code) ?>" hreflang="<?= e($code) ?>"
-                           <?= $code === $loc ? 'aria-current="true"' : '' ?>><?= e($info['name']) ?></a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <details class="lang-menu" data-lang-menu>
+                <summary aria-label="<?= e(t('common.language') . ' : ' . ($locales[$loc]['name'] ?? $loc)) ?>">
+                    <span class="lang-code" aria-hidden="true"><?= e(strtoupper($loc)) ?></span>
+                </summary>
+                <ul aria-label="<?= e(t('common.language')) ?>">
+                    <?php foreach ($locales as $code => $info): ?>
+                        <li>
+                            <a href="<?= e(lurl((string) $path, $code)) ?>" lang="<?= e($code) ?>" hreflang="<?= e($code) ?>"
+                               <?= $code === $loc ? 'aria-current="true"' : '' ?>><?= e($info['name']) ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </details>
         </nav>
     </div>
 </header>
