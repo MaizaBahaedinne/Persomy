@@ -22,9 +22,6 @@ final class Logger
     private static function write(string $level, string $message, array $context): void
     {
         $dir = BASE_PATH . '/storage/logs';
-        if (!is_dir($dir) && !@mkdir($dir, 0750, true) && !is_dir($dir)) {
-            return;
-        }
         $parts = [];
         foreach ($context as $key => $value) {
             if (is_scalar($value)) {
@@ -38,7 +35,14 @@ final class Logger
             self::clean($message, 500),
             $parts ? ' ' . implode(' ', $parts) : ''
         );
-        @file_put_contents($dir . '/app-' . date('Y-m-d') . '.log', $line, FILE_APPEND | LOCK_EX);
+        $written = false;
+        if (is_dir($dir) || @mkdir($dir, 0750, true) || is_dir($dir)) {
+            $written = @file_put_contents($dir . '/app-' . date('Y-m-d') . '.log', $line, FILE_APPEND | LOCK_EX) !== false;
+        }
+        if (!$written) {
+            // Dossier non inscriptible : repli sur le journal d'erreurs PHP / du serveur web.
+            error_log('[Persomy] ' . trim($line));
+        }
     }
 
     private static function clean(string $value, int $max): string
