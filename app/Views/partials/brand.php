@@ -1,10 +1,10 @@
 <?php
 /**
  * Emplacement TEMPORAIRE du logo.
- * Pour installer le logo officiel : déposer public/assets/img/logo.svg (ou logo.png) ; il sera utilisé automatiquement.
+ * Pour installer le logo officiel : déposer public/assets/img/logo.webp (ou logo.svg / logo.png) ; il sera utilisé automatiquement.
  */
 $logoFile = null;
-foreach (['logo.svg', 'logo.png'] as $candidate) {
+foreach (['logo.webp', 'logo.svg', 'logo.png'] as $candidate) {
     if (is_file(BASE_PATH . '/public/assets/img/' . $candidate)) {
         $logoFile = $candidate;
         break;
@@ -16,6 +16,11 @@ $brandName = (string) setting('site_name', 'Persomy');
     <?php if ($logoFile): ?>
         <img src="<?= e(asset('img/' . $logoFile)) ?>" alt="<?= e($brandName) ?>" height="32">
     <?php else: ?>
+        <svg class="brand-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
+            <defs><linearGradient id="bm-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b73ff"/><stop offset="1" stop-color="#0f3fcc"/></linearGradient></defs>
+            <rect width="32" height="32" rx="9" fill="url(#bm-g)"/>
+            <path d="M11.5 23V9h6a4.5 4.5 0 0 1 0 9h-6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <span class="brand-text"><?= e(mb_strtoupper($brandName)) ?></span>
     <?php endif; ?>
 </a>

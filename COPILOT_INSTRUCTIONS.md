@@ -26,7 +26,7 @@ Référence : `Cahier_des_charges_Persomy_CyberPanel_Copilot.pdf`. Lire aussi `R
 - FR / EN / AR (RTL) obligatoires. Toute nouvelle chaîne d'interface est ajoutée aux trois fichiers de `app/Languages/` (le test de parité échoue sinon).
 - Une traduction manquante est signalée (repli explicite via `Translations::pick`), jamais présentée comme complète.
 - Ne jamais inventer de clients, chiffres, témoignages, adresses, coordonnées ou projets réels. Données de démonstration : `is_demo = 1`, texte explicitement fictif. Informations officielles manquantes : marqueur `[À COMPLÉTER …]` / `[TO BE COMPLETED …]` / `[يُستكمل لاحقًا …]` (non affiché publiquement pour les coordonnées).
-- Logo : emplacement temporaire remplaçable (`public/assets/img/logo.svg|png`) ; ne pas inventer de logo officiel.
+- Logo : emplacement temporaire remplaçable (`public/assets/img/logo.webp|svg|png`) ; ne pas inventer de logo officiel.
 
 ## Formulaire de contact
 - Ne jamais annoncer un envoi qui a échoué : trois issues honnêtes (`sent`, `saved`, `saved_mail_failed`) et une erreur si rien n'a pu être enregistré ni envoyé.

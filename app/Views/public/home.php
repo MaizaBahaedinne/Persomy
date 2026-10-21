@@ -6,17 +6,25 @@
  */
 ?>
 <section class="hero">
-    <div class="container hero-inner">
-        <p class="eyebrow">Persomy · Digital Solutions</p>
-        <h1<?= lang_attrs($page) ?>><?= e($page['title']) ?></h1>
-        <?php if (trim((string) $page['intro']) !== ''): ?>
-            <p class="lead"<?= lang_attrs($page) ?>><?= e($page['intro']) ?></p>
-        <?php endif; ?>
-        <div class="hero-actions">
-            <a class="btn btn-primary" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
-            <a class="btn btn-ghost" href="<?= e(lurl('portfolio')) ?>"><?= e(t('cta.projects')) ?></a>
+    <div class="container hero-grid">
+        <div class="hero-inner">
+            <p class="eyebrow">Persomy · Digital Solutions</p>
+            <h1<?= lang_attrs($page) ?>><?= e($page['title']) ?></h1>
+            <?php if (trim((string) $page['intro']) !== ''): ?>
+                <p class="lead"<?= lang_attrs($page) ?>><?= e($page['intro']) ?></p>
+            <?php endif; ?>
+            <div class="hero-actions">
+                <a class="btn btn-primary btn-arrow" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
+                <a class="btn btn-ghost" href="<?= e(lurl('portfolio')) ?>"><?= e(t('cta.projects')) ?></a>
+            </div>
+            <p class="hero-meta">
+                <span class="hero-meta-label"><?= e(t('footer.offices')) ?></span>
+                <span class="pill-dark">Paris</span>
+                <span class="pill-dark">Tunis</span>
+            </p>
+            <?php $row = $page; require BASE_PATH . '/app/Views/partials/fallback.php'; ?>
         </div>
-        <?php $row = $page; require BASE_PATH . '/app/Views/partials/fallback.php'; ?>
+        <?php require BASE_PATH . '/app/Views/partials/hero_visual.php'; ?>
     </div>
 </section>
 
@@ -27,7 +35,7 @@
             <h2><?= e(t('home.expertise_title')) ?></h2>
             <p><?= e(t('home.expertise_intro')) ?></p>
         </header>
-        <div class="grid grid-3">
+        <div class="grid-fill">
             <?php foreach ($services as $service): ?>
                 <?php require BASE_PATH . '/app/Views/partials/service_card.php'; ?>
             <?php endforeach; ?>
@@ -53,7 +61,7 @@
 </section>
 <?php endif; ?>
 
-<section class="section">
+<section class="section section-dark">
     <div class="container">
         <header class="section-head">
             <h2><?= e(t('home.method_title')) ?></h2>
@@ -76,6 +84,6 @@
             <h2><?= e(t('cta.discuss')) ?></h2>
             <p><?= e(t('cta.discuss_text')) ?></p>
         </div>
-        <a class="btn btn-light" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
+        <a class="btn btn-light btn-arrow" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
     </div>
 </section>

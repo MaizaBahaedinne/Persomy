@@ -13,7 +13,7 @@
 <section class="section">
     <div class="container">
         <?php $row = $page; require BASE_PATH . '/app/Views/partials/fallback.php'; ?>
-        <div class="grid grid-3">
+        <div class="grid-fill">
             <?php foreach ($services as $service): ?>
                 <?php require BASE_PATH . '/app/Views/partials/service_card.php'; ?>
             <?php endforeach; ?>

@@ -22,9 +22,9 @@ $privacyUrl = lurl('privacy');
     </div>
 </section>
 
-<section class="section">
+<section class="section section-soft">
     <div class="container contact-grid">
-        <div>
+        <div class="form-card">
             <?php $row = $page; require BASE_PATH . '/app/Views/partials/fallback.php'; ?>
 
             <?php if ($result !== null): ?>

@@ -21,15 +21,33 @@
 
   // Apparition douce au défilement (désactivée si l'utilisateur réduit les animations).
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // En-tête : ombre dès que la page défile.
+  if (header) {
+    var onScroll = function () { header.classList.toggle('is-scrolled', window.scrollY > 8); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  // Halo qui suit le pointeur sur les cartes de services (souris uniquement).
+  if (!reduce && window.matchMedia && window.matchMedia('(hover: hover)').matches) {
+    document.querySelectorAll('.service-card').forEach(function (card) {
+      card.addEventListener('pointermove', function (event) {
+        var rect = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (event.clientX - rect.left) + 'px');
+        card.style.setProperty('--my', (event.clientY - rect.top) + 'px');
+      });
+    });
+  }
   if (!reduce && 'IntersectionObserver' in window) {
-    var targets = document.querySelectorAll('.card, .step, .section-head, .cta-inner');
+    var targets = document.querySelectorAll('.card, .step, .section-head, .cta-inner, .empty-state');
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
           entry.target.classList.add('is-visible');
           observer.unobserve(entry.target);
           // Retire les classes une fois l'animation terminée (préserve les effets au survol).
-          setTimeout(function (el) { el.classList.remove('reveal', 'is-visible'); }, 800, entry.target);
+          setTimeout(function (el) { el.classList.remove('reveal', 'is-visible'); }, 1300, entry.target);
         }
       });
     }, { rootMargin: '0px 0px -8% 0px' });

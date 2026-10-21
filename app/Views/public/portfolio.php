@@ -26,7 +26,11 @@
         <?php endif; ?>
 
         <?php if (!$projects): ?>
-            <p class="empty"><?= e(t('portfolio.empty')) ?></p>
+            <div class="empty-state">
+                <div class="card-icon"><?= icon('portfolio') ?></div>
+                <p><?= e(t('portfolio.empty')) ?></p>
+                <a class="btn btn-outline btn-arrow" href="<?= e(lurl('contact')) ?>"><?= e(t('cta.contact')) ?></a>
+            </div>
         <?php else: ?>
             <div class="grid grid-3">
                 <?php foreach ($projects as $project): ?>
